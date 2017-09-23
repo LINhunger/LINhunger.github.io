@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="学习心得,7.26,数组," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="Java数组">
+<meta name="keywords" content="学习心得,7.26,数组">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java数组">
+<meta property="og:url" content="https://LINhunger.github.io/2017/07/26/Java数组/index.html">
+<meta property="og:site_name" content="小排骨和他的小霸王学习机">
+<meta property="og:description" content="Java数组">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-07-26T12:45:49.088Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java数组">
+<meta name="twitter:description" content="Java数组">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '2HS2W2NK4P',
+      apiKey: '161bd5753774a3f862efb9e010c5a870',
+      indexName: 'hunger_blog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://LINhunger.github.io/2017/07/26/Java数组/"/>
+
+
+
+
+
+  <title>Java数组 | 小排骨和他的小霸王学习机</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小排骨和他的小霸王学习机</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">天下事有难易乎？为之，则难者亦易矣；不为，则易者亦难矣。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-主页">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            主页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-归档">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-分类">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Suche
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://LINhunger.github.io/2017/07/26/Java数组/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="林寒弋">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/touxiang.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小排骨和他的小霸王学习机">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline" style="font-size:-webkit-xxx-large">Java数组</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-26T16:55:33+08:00">
+                2017-07-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">
+                  Java数组
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Java数组的一些学习心得。</p>
+<a id="more"></a>
+<p>[TOC]</p>
+<h3 id="一、什么是数组"><a href="#一、什么是数组" class="headerlink" title="一、什么是数组"></a>一、什么是数组</h3><p>数组是一个简单的复合数据类型，它是一系列有序数据的集合，它当中的每一个数据都具有相同的数据类型，我们通过数组名加上一个不会越界的下标值来唯一地确定数组中的元素。另外，数组也是一个特殊的对象。</p>
+<h4 id="一）数组对象的类"><a href="#一）数组对象的类" class="headerlink" title="一）数组对象的类"></a>一）数组对象的类</h4><p>既然数组是一个对象，那么数组的类是什么呢？我们以int一维数组为例。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;   </div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String args[])</span></span>&#123;   </div><div class="line">      <span class="keyword">int</span> a[] = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">10</span>];</div><div class="line">      Class clazz = a.getClass();   </div><div class="line">      System.out.println(clazz.getName());   </div><div class="line">	&#125;   </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>代码输出为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[I</div></pre></td></tr></table></figure>
+<p>看起来数组的类很奇怪，非但不属于任何包，而且名称还不是合法的标识符(identifier)。具体的命名规则[1]可以参见java.lang.Class.getName()的javadoc。简单的说，数组的类名由若干个’[‘和数组元素类型的内部名称组成，’[‘的数目代表了数组的维度。</p>
+<p><strong>具有相同类型元素和相同维度的数组，属于同一个类。</strong>如果两个数组的元素类型相同，但维度不同，那么它们也属于不同的类。如果两个数组的元素类型和维度均相同，但长度不同，那么它们还是属于同一个类。</p>
+<h4 id="二）数组的类有哪些成员"><a href="#二）数组的类有哪些成员" class="headerlink" title="二）数组的类有哪些成员"></a>二）数组的类有哪些成员</h4><p>既然我们知道了数组的类名是什么，那么就去看看数组的类究竟是什么样的吧？有哪些成员变量？有哪些成员方法？length这个成员变量在哪？是不是没有length()这个成员方法？</p>
+<p>找来找去，在JDK的代码中没有找打’[I’这个类。想想也对，’[I’都不是一个合法的标识符，肯定不会出现public class [I {…}这样的Java代码。我们暂且不管[I类是谁声明的，怎么声明的，先用反射机制一探究竟吧。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;   </div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;   </div><div class="line">    <span class="keyword">int</span> a[] = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">10</span>]; </div><div class="line">    Class clazz = a.getClass();   </div><div class="line">    System.out.println(clazz.getDeclaredFields().length);   </div><div class="line">    System.out.println(clazz.getDeclaredMethods().length);   </div><div class="line">    System.out.println(clazz.getDeclaredConstructors().length);   </div><div class="line">    System.out.println(clazz.getDeclaredAnnotations().length);   </div><div class="line">    System.out.println(clazz.getDeclaredClasses().length);   </div><div class="line">    System.out.println(clazz.getSuperclass());   </div><div class="line">  &#125;   </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>代码输出为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">0 </div><div class="line">0 </div><div class="line">0 </div><div class="line">0 </div><div class="line">0 </div><div class="line">class java.lang.Object</div></pre></td></tr></table></figure>
+<p>可见，[I这个类是java.lang.Object的直接子类，自身没有声明任何成员变量、成员方法、构造函数和Annotation，可以说，[I就是个空类。我们立马可以想到一个问题：怎么连length这个成员变量都没有呢？如果真的没有，编译器怎么不报语法错呢？想必编译器对Array.length进行了特殊处理哇！</p>
+<h4 id="三）数组的类在哪里声明的"><a href="#三）数组的类在哪里声明的" class="headerlink" title="三）数组的类在哪里声明的"></a>三）数组的类在哪里声明的</h4><p>先不管为什么没有length成员变量，我们先搞清楚[I这个类是哪里声明的吧。既然[I都不是合法的标识符，那么这个类肯定不是在Java代码中显式声明的。想来想去，只能是JVM自己在运行时生成的了。JVM生成类还是一件很容易的事情，甚至无需生成字节码，直接在方法区中创建类型数据，就差不多完工了。</p>
+<p>根据Java虚拟机规范描述，Java数组的创建过程大致如下：</p>
+<ol>
+<li>类加载器先看看数组类是否已经被创建了。如果没有，那就说明需要创建数组类；如果有，那就无需创建了。</li>
+<li>如果数组元素是引用类型，那么类加载器首先去加载数组元素的类。</li>
+<li>JVM根据元素类型和维度，创建相应的数组类。</li>
+</ol>
+<blockquote>
+<p>小记：JVM会偷偷地创建数组类，并且是动态地生成数组类，因为Java数组类的数量与元素类型、维度（max:255）有关，是无法预先声明好的。</p>
+</blockquote>
+<p>我们看一段代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;   </div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123; </div><div class="line">    <span class="keyword">int</span> a[] = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">2</span>];</div><div class="line">    <span class="keyword">int</span> i = a.length;   </div><div class="line">  &#125;   </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>会得到这样的字节码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="number">0</span> iconst_2                   <span class="comment">//将int型常量2压入操作数栈  </span></div><div class="line"><span class="number">1</span> newarray <span class="number">10</span> (<span class="keyword">int</span>)    <span class="comment">//将2弹出操作数栈，作为长度，创建一个元素类型为int, 维度为1的数组，并将数组的引用压入操作数栈  </span></div><div class="line"><span class="number">3</span> astore_1                 <span class="comment">//将数组的引用从操作数栈中弹出，保存在索引为1的局部变量(即a)中  </span></div><div class="line"><span class="number">4</span> aload_1                  <span class="comment">//将索引为1的局部变量(即a)压入操作数栈  </span></div><div class="line"><span class="number">5</span> arraylength            <span class="comment">//从操作数栈弹出数组引用(即a)，并获取其长度(JVM负责实现如何获取)，并将长度压入操作数栈  </span></div><div class="line"><span class="number">6</span> istore_2                 <span class="comment">//将数组长度从操作数栈弹出，保存在索引为2的局部变量(即i)中  </span></div><div class="line"><span class="number">7</span> <span class="keyword">return</span>                    <span class="comment">//main方法返回</span></div></pre></td></tr></table></figure>
+<p>可见，在这段字节码中，根本就没有看见length这个成员变量，获取数组长度是由一条特定的指令arraylength实现(怎么实现就不管了，JVM总有办法)。编译器对Array.length这样的语法做了特殊处理，直接编译成了arraylength指令。另外，JVM创建数组类，应该就是由newarray这条指令触发的了.</p>
+<p>很自然地想到，编译器也可以对Array.length()这样的语法做特殊处理，直接编译成arraylength指令。这样的话，我们就可以使用方法调用的风格获取数组的长度了，这样看起来貌似也更加OO一点。那为什么不使用Array.length()的语法呢？也许是开发Java的那帮天才对.length有所偏爱，或者抛硬币拍脑袋随便决定的吧。 形式不重要，重要的是我们明白了背后的机理。</p>
+<h3 id="二、数组的其他方面"><a href="#二、数组的其他方面" class="headerlink" title="二、数组的其他方面"></a>二、数组的其他方面</h3><h4 id="一）变长数组"><a href="#一）变长数组" class="headerlink" title="一）变长数组"></a>一）变长数组</h4><p>那么如何来实现变长数组呢？我们可以利用 List 集合 add 方法里面的扩容思路来模拟实现。下面是 ArrayList 的扩容方法:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ensureCapacity</span><span class="params">(<span class="keyword">int</span> minCapacity)</span> </span>&#123;</div><div class="line">    modCount++;  </div><div class="line">    <span class="keyword">int</span> oldCapacity = elementData.length;</div><div class="line">     <span class="comment">/**</span></div><div class="line"><span class="comment">      * 若当前需要的长度超过数组长度时进行扩容处理</span></div><div class="line"><span class="comment">      */</span></div><div class="line">     <span class="keyword">if</span> (minCapacity &gt; oldCapacity) &#123;</div><div class="line">     Object oldData[] = elementData;    </div><div class="line">     <span class="keyword">int</span> newCapacity = (oldCapacity * <span class="number">3</span>) / <span class="number">2</span> + <span class="number">1</span>;    <span class="comment">//扩容</span></div><div class="line">     <span class="keyword">if</span> (newCapacity &lt; minCapacity)</div><div class="line">     newCapacity = minCapacity;</div><div class="line">     <span class="comment">//拷贝数组，生成新的数组</span></div><div class="line">     elementData = Arrays.copyOf(elementData, newCapacity);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这段代码对我们有用的地方就在于 if 语句后面。它的思路是将原始数组拷贝到新数组中，新数组是原始数组长度的 1.5 倍。所以模拟的数组扩容代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ArrayUtils</span> </span>&#123;</div><div class="line">   <span class="comment">/**</span></div><div class="line"><span class="comment">    * <span class="doctag">@desc</span> 对数组进行扩容</span></div><div class="line"><span class="comment">    * <span class="doctag">@param</span> &lt;T&gt;</span></div><div class="line"><span class="comment">    * <span class="doctag">@param</span> datas 原始数组</span></div><div class="line"><span class="comment">    * <span class="doctag">@param</span> newLen 扩容大小</span></div><div class="line"><span class="comment">    * <span class="doctag">@return</span> T[]</span></div><div class="line"><span class="comment">    */</span></div><div class="line">   <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; T[] expandCapacity(T[] datas,<span class="keyword">int</span> newLen)&#123;</div><div class="line">      newLen = newLen &lt; <span class="number">0</span> ? datas.length :datas.length + newLen;</div><div class="line">      <span class="comment">//生成一个新的数组</span></div><div class="line">      <span class="keyword">return</span> Arrays.copyOf(datas, newLen);</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   <span class="comment">/**</span></div><div class="line"><span class="comment">    * <span class="doctag">@desc</span> 对数组进行扩容处理，1.5倍</span></div><div class="line"><span class="comment">    * <span class="doctag">@param</span> &lt;T&gt;</span></div><div class="line"><span class="comment">    * <span class="doctag">@param</span> datas  原始数组</span></div><div class="line"><span class="comment">    * <span class="doctag">@return</span> T[]</span></div><div class="line"><span class="comment">    */</span></div><div class="line">   <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; T[] expandCapacity(T[] datas)&#123;</div><div class="line">      <span class="keyword">int</span> newLen = (datas.length * <span class="number">3</span>) / <span class="number">2</span>;      <span class="comment">//扩容原始数组的1.5倍</span></div><div class="line">      <span class="comment">//生成一个新的数组</span></div><div class="line">      <span class="keyword">return</span> Arrays.copyOf(datas, newLen);</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   <span class="comment">/**</span></div><div class="line"><span class="comment">    * <span class="doctag">@desc</span> 对数组进行扩容处理，</span></div><div class="line"><span class="comment">    * <span class="doctag">@param</span> &lt;T&gt;</span></div><div class="line"><span class="comment">    * <span class="doctag">@param</span> datas 原始数组</span></div><div class="line"><span class="comment">    * <span class="doctag">@param</span> mulitiple 扩容的倍数</span></div><div class="line"><span class="comment">    * <span class="doctag">@return</span> T[]</span></div><div class="line"><span class="comment">    */</span></div><div class="line">   <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; T[] expandCapacityMul(T[] datas,<span class="keyword">int</span> mulitiple)&#123;</div><div class="line">      mulitiple = mulitiple &lt; <span class="number">0</span> ? <span class="number">1</span> : mulitiple;</div><div class="line">      <span class="keyword">int</span> newLen = datas.length * mulitiple;</div><div class="line">      <span class="keyword">return</span> Arrays.copyOf(datas,newLen );</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>通过这种迂回的方式我们可以实现数组的扩容。因此在项目中如果确实需要变长的数据集，数组也是在考虑范围之内的，我们不能因为他是固定长度而排斥他！</p>
+<h4 id="二）数组的复制问题"><a href="#二）数组的复制问题" class="headerlink" title="二）数组的复制问题"></a>二）数组的复制问题</h4><p>以前在做集合拷贝的时候由于集合没有拷贝的方法，所以一个一个的复制是非常麻烦的，所以我就干脆使用 List.toArray() 方法转换成数组然后再通过 Arrays.copyOf 拷贝，在转换成集合，个人觉得非常方便，殊不知我已经陷入了其中的陷进！我们知道若数组元素为对象，则数组里面数据是对象引用。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">      Person person_01 = <span class="keyword">new</span> Person(<span class="string">"chenssy_01"</span>);</div><div class="line"></div><div class="line">      Person[] persons1 = <span class="keyword">new</span> Person[]&#123;person_01&#125;;</div><div class="line">      Person[] persons2 = Arrays.copyOf(persons1,persons1.length);</div><div class="line"></div><div class="line">      System.out.println(<span class="string">"数组persons1:"</span>);</div><div class="line">      display(persons1);</div><div class="line">      System.out.println(<span class="string">"---------------------"</span>);</div><div class="line">      System.out.println(<span class="string">"数组persons2:"</span>);</div><div class="line">      display(persons2);</div><div class="line">      <span class="comment">//改变其值</span></div><div class="line">      persons2[<span class="number">0</span>].setName(<span class="string">"chessy_02"</span>);</div><div class="line">      System.out.println(<span class="string">"------------改变其值后------------"</span>);</div><div class="line">      System.out.println(<span class="string">"数组persons1:"</span>);</div><div class="line">      display(persons1);</div><div class="line">      System.out.println(<span class="string">"---------------------"</span>);</div><div class="line">      System.out.println(<span class="string">"数组persons2:"</span>);</div><div class="line">      display(persons2);</div><div class="line">   &#125;</div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">display</span><span class="params">(Person[] persons)</span></span>&#123;</div><div class="line">      <span class="keyword">for</span>(Person person : persons)&#123;</div><div class="line">         System.out.println(person.toString());</div><div class="line">      &#125;</div><div class="line">   &#125;</div><div class="line">&#125;</div><div class="line">-------------Output:</div><div class="line">数组persons1:</div><div class="line">姓名是：chenssy_01</div><div class="line">---------------------</div><div class="line">数组persons2:</div><div class="line">姓名是：chenssy_01</div><div class="line">------------改变其值后------------</div><div class="line">数组persons1:</div><div class="line">姓名是：chessy_02</div><div class="line">---------------------</div><div class="line">数组persons2:</div><div class="line">姓名是：chessy_02</div></pre></td></tr></table></figure>
+<p>从结果中发现,persons1 中的值也发生了改变，这是典型的浅拷贝问题。所以通过 Arrays.copyOf() 方法产生的数组是一个浅拷贝。同时数组的 clone() 方法也是，集合的 clone() 方法也是，所以我们在使用拷贝方法的同时一定要注意浅拷贝这问题。</p>
+<h4 id="三）数组转换为List注意的地方"><a href="#三）数组转换为List注意的地方" class="headerlink" title="三）数组转换为List注意的地方"></a>三）数组转换为List注意的地方</h4><p>我们经常需要使用到 Arrays 这个工具的 asList() 方法将其转换成列表。方便是方便，但是有时候会出现莫名其妙的问题。如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">   <span class="keyword">int</span>[] datas = <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>&#125;;</div><div class="line">   List list = Arrays.asList(datas);</div><div class="line">   System.out.println(list.size());</div><div class="line">&#125;</div><div class="line"> ------------Output:</div><div class="line"><span class="number">1</span></div></pre></td></tr></table></figure>
+<p>结果是 1,是的你没有看错, 结果就是 1。但是为什么会是 1 而不是 5 呢？先看 asList() 的源码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">List&lt;T&gt; <span class="title">asList</span><span class="params">(T... a)</span> </span>&#123;</div><div class="line">      <span class="keyword">return</span> <span class="keyword">new</span> ArrayList&lt;T&gt;(a);</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p>注意这个参数:T…a，这个参数是一个泛型的变长参数，我们知道基本数据类型是不可能泛型化的，也是就说 8 个基本数据类型是不可作为泛型参数的，但是为什么编译器没有报错呢？这是因为在 Java 中，数组会当做一个对象来处理，它是可以泛型的，所以我们的程序是把一个 int 型的数组作为了 T 的类型，所以在转换之后 List 中就只会存在一个类型为 int 数组的元素了。所以我们这样的程序 System.out.println(datas.equals(list.get(0)));输出结果肯定是 true。当然如果将int改为 Integer，则长度就会变成 5 了。</p>
+<p>我们在看下面程序：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">enum</span> Week&#123;Sum,Mon,Tue,Web,Thu,Fri,Sat&#125;</div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">      Week[] weeks = &#123;Week.Sum,Week.Mon,Week.Tue,Week.Web,Week.Thu,Week.Fri&#125;;</div><div class="line">      List&lt;Week&gt; list = Arrays.asList(weeks);</div><div class="line">      list.add(Week.Sat);</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<p>这个程序非常简单，就是讲一个数组转换成 list，然后改变集合中值，但是运行呢？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Exception in thread <span class="string">"main"</span>   java.lang.UnsupportedOperationException</div><div class="line">at java.util.AbstractList.add(AbstractList.java:<span class="number">131</span>)</div><div class="line">at java.util.AbstractList.add(AbstractList.java:<span class="number">91</span>)</div><div class="line">at com.array.Test.main(Test.java:<span class="number">18</span>)</div></pre></td></tr></table></figure>
+<p>编译没错，但是运行竟然出现了异常错误！UnsupportedOperationException，当不支持请求的操作时，就会抛出该异常。从某种程度上来说就是不支持add方法，我们知道这是不可能的！什么原因引起这个异常呢？先看 asList() 的源代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">List&lt;T&gt; <span class="title">asList</span><span class="params">(T... a)</span> </span>&#123;</div><div class="line">      <span class="keyword">return</span> <span class="keyword">new</span> ArrayList&lt;T&gt;(a);</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p>这里是直接返回一个 ArrayList 对象返回，但是注意这个 ArrayList 并不是 java.util.ArrayList,而是 Arrays 工具类的一个内置类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ArrayList</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">AbstractList</span>&lt;<span class="title">E</span>&gt;</span></div><div class="line"><span class="class">      <span class="keyword">implements</span> <span class="title">RandomAccess</span>, <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span></span>&#123;</div><div class="line">   <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID =   -<span class="number">2764017481108945198L</span>;</div><div class="line">   <span class="keyword">private</span> <span class="keyword">final</span> E[] a;</div><div class="line">   ArrayList(E[] array) &#123;</div><div class="line">      <span class="keyword">if</span> (array==<span class="keyword">null</span>)</div><div class="line">         <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</div><div class="line">      a = array;</div><div class="line">   &#125;</div><div class="line">   <span class="comment">/** 省略方法 **/</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>但是这个内部类并没有提供 add() 方法，那么查看父类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">add</span><span class="params">(E e)</span> </span>&#123;</div><div class="line">   add(size(), e);</div><div class="line">   <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(<span class="keyword">int</span> index, E element)</span> </span>&#123;</div><div class="line">   <span class="keyword">throw</span> <span class="keyword">new</span> UnsupportedOperationException();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里父类仅仅只是提供了方法，方法的具体实现却没有，所以具体的实现需要子类自己来提供，但是非常遗憾</p>
+<p>这个内部类 ArrayList 并没有提供 add 的实现方法。在 ArrayList 中，它主要提供了如下几个方法：</p>
+<ol>
+<li>size：元素数量</li>
+<li>toArray：转换为数组，实现了数组的浅拷贝。</li>
+<li>get：获得指定元素。</li>
+<li>contains：是否包含某元素。</li>
+</ol>
+<p>所以综上所述，asList 返回的是一个长度不可变的列表。数组是多长，转换成的列表是多长，我们是无法通过 add、remove 来增加或者减少其长度的。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/学习心得/" rel="tag"># 学习心得</a>
+          
+            <a href="/tags/7-26/" rel="tag"># 7.26</a>
+          
+            <a href="/tags/数组/" rel="tag"># 数组</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/24/Java泛型/" rel="next" title="Java泛型">
+                <i class="fa fa-chevron-left"></i> Java泛型
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/27/JavaIO流/" rel="prev" title="JavaIO">
+                JavaIO <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            <!--Inhaltsverzeichnis-->
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            <!--Übersicht-->
+            站点概况
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          
+            <img class="site-author-image" itemprop="image"
+              src="/images/touxiang.jpg"
+              alt="林寒弋" style="height: 130px; max-width: 130px" />
+          
+            <p class="site-author-name" itemprop="name">林寒弋</p>
+            <p class="site-description motion-element" itemprop="description">天下事有难易乎？为之，则难者亦易矣；不为，则易者亦难矣。</p>
+        </div>
+
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives">
+            
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name"><!--Artikel-->文章</span>
+              </a>
+            </div>
+          
+
+          
+          
+              <div class="site-state-item site-state-tags">
+                  <a href="/tags">
+                      <span class="site-state-item-count">20</span>
+                      <span class="site-state-item-name"><!-- Tags -->标签</span>
+                  </a>
+              </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.vcoder.top" title="直播demo" target="_blank">直播demo</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、什么是数组"><span class="nav-number">1.</span> <span class="nav-text">一、什么是数组</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#一）数组对象的类"><span class="nav-number">1.1.</span> <span class="nav-text">一）数组对象的类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#二）数组的类有哪些成员"><span class="nav-number">1.2.</span> <span class="nav-text">二）数组的类有哪些成员</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#三）数组的类在哪里声明的"><span class="nav-number">1.3.</span> <span class="nav-text">三）数组的类在哪里声明的</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、数组的其他方面"><span class="nav-number">2.</span> <span class="nav-text">二、数组的其他方面</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#一）变长数组"><span class="nav-number">2.1.</span> <span class="nav-text">一）变长数组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#二）数组的复制问题"><span class="nav-number">2.2.</span> <span class="nav-text">二）数组的复制问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#三）数组转换为List注意的地方"><span class="nav-number">2.3.</span> <span class="nav-text">三）数组转换为List注意的地方</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">林寒弋</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Erstellt mit  <a class="theme-link" href="https://hexo.io">Hexo</a></div>
+
+  <span class="post-meta-divider">|</span>
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.2</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.2"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

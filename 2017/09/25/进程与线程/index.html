@@ -53,7 +53,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="5.23,设计模式,单例模式," />
+  <meta name="keywords" content="多线程,并发编程,操作系统," />
 
 
 
@@ -69,20 +69,18 @@
 
 
 
-<meta name="description" content="单例模式(Singleton Pattern)：单例模式确保某一个类只有一个实例，而且自行实例化并向整个系统提供这个实例，这个类称为单例类，它提供全局访问的方法。">
-<meta name="keywords" content="5.23,设计模式,单例模式">
+<meta name="description" content="在OS中引入线程的目的是为了是多个程序能够并发执行，以提高资源利用率和系统吞吐量。而引入线程，则是为了减少程序在并发执行时所付出的时空开销，使OS具有更好地并发性。">
+<meta name="keywords" content="多线程,并发编程,操作系统">
 <meta property="og:type" content="article">
-<meta property="og:title" content="设计模式之单例模式">
-<meta property="og:url" content="https://LINhunger.github.io/2017/05/24/设计模式之单例模式/index.html">
+<meta property="og:title" content="进程与线程">
+<meta property="og:url" content="https://LINhunger.github.io/2017/09/25/进程与线程/index.html">
 <meta property="og:site_name" content="小排骨和他的小霸王学习机">
-<meta property="og:description" content="单例模式(Singleton Pattern)：单例模式确保某一个类只有一个实例，而且自行实例化并向整个系统提供这个实例，这个类称为单例类，它提供全局访问的方法。">
+<meta property="og:description" content="在OS中引入线程的目的是为了是多个程序能够并发执行，以提高资源利用率和系统吞吐量。而引入线程，则是为了减少程序在并发执行时所付出的时空开销，使OS具有更好地并发性。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://design-patterns.readthedocs.io/zh_CN/latest/_images/Singleton.jpg">
-<meta property="og:updated_time" content="2017-07-24T06:54:36.313Z">
+<meta property="og:updated_time" content="2017-09-25T12:26:32.695Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="设计模式之单例模式">
-<meta name="twitter:description" content="单例模式(Singleton Pattern)：单例模式确保某一个类只有一个实例，而且自行实例化并向整个系统提供这个实例，这个类称为单例类，它提供全局访问的方法。">
-<meta name="twitter:image" content="http://design-patterns.readthedocs.io/zh_CN/latest/_images/Singleton.jpg">
+<meta name="twitter:title" content="进程与线程">
+<meta name="twitter:description" content="在OS中引入线程的目的是为了是多个程序能够并发执行，以提高资源利用率和系统吞吐量。而引入线程，则是为了减少程序在并发执行时所付出的时空开销，使OS具有更好地并发性。">
 
 
 
@@ -112,13 +110,13 @@
 
 
 
-  <link rel="canonical" href="https://LINhunger.github.io/2017/05/24/设计模式之单例模式/"/>
+  <link rel="canonical" href="https://LINhunger.github.io/2017/09/25/进程与线程/"/>
 
 
 
 
 
-  <title>设计模式之单例模式 | 小排骨和他的小霸王学习机</title>
+  <title>进程与线程 | 小排骨和他的小霸王学习机</title>
   
 
 
@@ -273,7 +271,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://LINhunger.github.io/2017/05/24/设计模式之单例模式/">
+    <link itemprop="mainEntityOfPage" href="https://LINhunger.github.io/2017/09/25/进程与线程/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="林寒弋">
@@ -290,7 +288,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline" style="font-size:-webkit-xxx-large">设计模式之单例模式</h1>
+          <h1 class="post-title" itemprop="name headline" style="font-size:-webkit-xxx-large">进程与线程</h1>
         
 
         <div class="post-meta">
@@ -302,8 +300,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-24T20:46:09+08:00">
-                2017-05-24
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-25T11:54:31+08:00">
+                2017-09-25
               </time>
             
 
@@ -312,6 +310,28 @@
             
           </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/操作系统/" itemprop="url" rel="index">
+                    <span itemprop="name">操作系统</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -340,32 +360,44 @@
       
 
       
-        <p>单例模式(Singleton Pattern)：单例模式确保某一个类只有一个实例，而且自行实例化并向整个系统提供这个实例，这个类称为单例类，它提供全局访问的方法。</p>
+        <p>在OS中引入线程的目的是为了是多个程序能够并发执行，以提高资源利用率和系统吞吐量。而引入线程，则是为了减少程序在并发执行时所付出的时空开销，使OS具有更好地并发性。</p>
 <a id="more"></a>
-<h2 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h2><h3 id="1-模式动机"><a href="#1-模式动机" class="headerlink" title="1. 模式动机"></a>1. 模式动机</h3><p>对于系统中的某些类来说，只有一个实例很重要，例如，一个系统可以存在多个打印任务，但是只能有一个正在工作的任务；一个系统只能有一个窗口管理器或文件系统；一个系统只能有一个计时工具或ID生成器。</p>
-<p>如何保证一个类只有一个实例并且这个实例易于被访问呢？定义一个全局变量可以确保对象随时都可以被访问，但不能防止我们实例化多个对象。</p>
-<p>一个更好的解决方法是让类自身负责保存它的唯一实例。这个类可以保证没有其他实例被创建，并且它可以提供一个访问该实例的方法。这就是单例模式的模式动机。</p>
-<h3 id="2-模式定义"><a href="#2-模式定义" class="headerlink" title="2. 模式定义"></a>2. 模式定义</h3><p>单例模式(Singleton Pattern)：单例模式确保某一个类只有一个实例，而且自行实例化并向整个系统提供这个实例，这个类称为单例类，它提供全局访问的方法。</p>
-<p>单例模式的要点有三个：</p>
-<ul>
-<li>某个类只能有一个实例。</li>
-<li>它必须自行创建这个实例。</li>
-<li>它必须自行向整个系统提供这个实例。</li>
-</ul>
-<h3 id="3-模式结构"><a href="#3-模式结构" class="headerlink" title="3. 模式结构"></a>3. 模式结构</h3><p>单例模式包含如下角色：</p>
-<ul>
-<li>Singleton:单例</li>
-</ul>
-<p><img src="http://design-patterns.readthedocs.io/zh_CN/latest/_images/Singleton.jpg" alt="../_images/Singleton.jpg"></p>
-<h3 id="4-代码分析"><a href="#4-代码分析" class="headerlink" title="4. 代码分析"></a>4. 代码分析</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BetterSingleton</span> </span>&#123;</div><div class="line">	<span class="function"><span class="keyword">private</span> <span class="title">BetterSingleton</span><span class="params">()</span> </span>&#123;</div><div class="line">		System.out.println(<span class="string">"singleton is create"</span>);</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">SingletonHolder</span> </span>&#123;</div><div class="line">		<span class="keyword">private</span> <span class="keyword">static</span> BetterSingleton singleton = <span class="keyword">new</span> BetterSingleton();</div><div class="line">	&#125;</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">synchronized</span> BetterSingleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="keyword">return</span> SingletonHolder.singleton;</div><div class="line">	&#125;	</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="5-模式分析"><a href="#5-模式分析" class="headerlink" title="5. 模式分析"></a>5. 模式分析</h3><p>单例模式的目的是保证一个类仅有一个实例，并提供一个访问它的全局访问点。单例模式包含的角色只有一个，就是单例类——Singleton.单例类拥有一个私有构造函数，确保用户无法通过new关键字直接实例化它。除此之外，<strong>该模式中包含一个静态私有成员变量与静态公有的工厂方法</strong> ，该工厂方法负责检验实例的存在并实例化自己，餐后存储在静态成员变量中，以确保只有一个实例被创建。</p>
-<p>在单例模式的实现过程中，需要注意如下三点：</p>
-<ul>
-<li>单例类的构造方法为私有。</li>
-<li>提供一个自身的静态私有成员变量。</li>
-<li>提供一个公有的静态工厂方法。</li>
-</ul>
-<h3 id="6-应用实例"><a href="#6-应用实例" class="headerlink" title="6. 应用实例"></a>6. 应用实例</h3>
+<h3 id="一、什么是进程"><a href="#一、什么是进程" class="headerlink" title="一、什么是进程"></a>一、什么是进程</h3><p>为了使计算机程序可以并发的执行，操作系统引入了进程这一概念。</p>
+<p>为了使参与并发执行的每个程序（包含数据）都能独立的运行，在操作系统中必须为之设置一个专门的数据结构，称为进程控制块（PCB）系统利用PCB来描述进程的基本情况和活动过程，进而控制和管理进程。<strong>由程序段、相关的数据段和PCB三部分便构成了进程实体（简称进程）。</strong></p>
+<p>对于进程的定义：</p>
+<blockquote>
+<p>进程是具有独立功能的程序在一个数据集合上运行的过程。它是系统进行<strong>资源分配</strong>和<strong>调度</strong>的独立单位。</p>
+</blockquote>
+<h4 id="（一）进程的特征"><a href="#（一）进程的特征" class="headerlink" title="（一）进程的特征"></a>（一）进程的特征</h4><ol>
+<li>动态性。进程的实质是进程实体的执行过程。它的动态性还表现在“它由创建产生，由调度执行，由撤销而消亡”，<strong>进程具有一定的生命周期。</strong></li>
+<li>并发性。是指多个进程实体同存与内存中，且能在一段时间内同时执行。<strong>引入进程的目的也是为了是使其进程实体能和其他进程实体并发执行。</strong></li>
+<li>独立性。在传统的OS中，独立性是指进程实体是一个能独立运行、独立获得资源和独立接受调度的基本单位，凡是未建立PCB的程序不能作为一个独立的单位参与运行。</li>
+<li>异步性。是指进程是按异步方式进行的，即按各自独立的、不可预知的速度向前推进。正是由于此因，将会导致程序执行时结果的不可再现性。为了使并发执行的程序的结果具有可再现性，必须配置进程同步机制。</li>
+</ol>
+<h3 id="二、什么是线程"><a href="#二、什么是线程" class="headerlink" title="二、什么是线程"></a>二、什么是线程</h3><h4 id="（一）线程的引入"><a href="#（一）线程的引入" class="headerlink" title="（一）线程的引入"></a>（一）线程的引入</h4><p>前面我们讲到：进程的两个基本的属性：</p>
+<ol>
+<li>进程是可拥有资源的独立单位。</li>
+<li>进程是可独立调度和分派的基本单位。</li>
+</ol>
+<p>进程作为资源的拥有者，因而在创建、撤销和切换中，系统必须为之付出较大的时空开销，这就限制了系统所设置的进程数目，并且进程的切换也不宜过于频繁，从而限制了进程的进一步提高。<strong>为了减少进程在并发执行时所付出的时空开销，操作系统引入的线程这一概念。</strong></p>
+<h4 id="（二）线程—调度和分派的基本单位"><a href="#（二）线程—调度和分派的基本单位" class="headerlink" title="（二）线程—调度和分派的基本单位"></a>（二）线程—调度和分派的基本单位</h4><p>将操作系统的进程的两个属性分开，有OS分开处理，也就是并不把作为<strong>拥有资源的独立单位</strong>也作为<strong>调度和分派的独立单位。</strong>对于拥有资源的独立单位（进程），不对之进行频繁的切换，而将线程，作为调度和分派的基本单位。</p>
+<h4 id="（三）进程和线程的比较"><a href="#（三）进程和线程的比较" class="headerlink" title="（三）进程和线程的比较"></a>（三）进程和线程的比较</h4><ol>
+<li><h5 id="调度的基本单位"><a href="#调度的基本单位" class="headerlink" title="调度的基本单位"></a>调度的基本单位</h5><p>线程在切换时，仅需要保存和设置少量的寄存器内容，切换代价远小于进程。同一个进程内的线程切换，并不会引起进程的切换。</p>
+</li>
+<li><h5 id="并发性"><a href="#并发性" class="headerlink" title="并发性"></a>并发性</h5><p>引入线程后，不仅不同的进程之间可以并发执行，并且同一个进程内的不同线程也可以并发地执行。这使得OS具有更好地并发性。</p>
+</li>
+<li><h5 id="拥有资源。进程可以拥有资源"><a href="#拥有资源。进程可以拥有资源" class="headerlink" title="拥有资源。进程可以拥有资源"></a>拥有资源。进程可以拥有资源</h5><p>并作为系统中拥有资源的基本单位。然而，线程并不具有系统资源，<strong>而是仅有一点并不可少的、能保证独立运行的资源。</strong></p>
+<p>比如，每个线程中都具有一个拥有控制线程运行的线程控制块（TCB）、用于指示被执行指令序列的程序计数器、保留局部变量、少数状态参数和返回地址等的一组寄存器和堆栈。</p>
+<p>线程除了拥有自己的少量资源外，还允许多个线程共享该进程所拥有的资源。</p>
+</li>
+<li><h5 id="独立性"><a href="#独立性" class="headerlink" title="独立性"></a>独立性</h5><p>在同一个进程中的不同线程之间的独立性要比不同进程之间的独立性低很多。这是因为同一个线程的不同线程往往是为了<strong>提高并发性</strong>以及<strong>进行相互之间和合作</strong>而创建的，它们共享进程的内存地址空间和资源。</p>
+</li>
+<li><h5 id="系统开销"><a href="#系统开销" class="headerlink" title="系统开销"></a>系统开销</h5><p>在创建或撤销进程的时候，系统都要为之分配和回收进程控制块、分配和回收其他资源，如内存空间、IO设备等。OS创建进程的开销，明显大于线程创建销毁的开销。类似似，进程切换的代价也远高于线程。</p>
+</li>
+<li><h5 id="多处理机系统"><a href="#多处理机系统" class="headerlink" title="多处理机系统"></a>多处理机系统</h5><p>单线程进程，不管有多少处理机，该进程只能运行在一个处理机上。对于多线程进程，就可以将一个进程里的多个线程分配到多个处理机上运行。</p>
+</li>
+</ol>
+
       
     </div>
     
@@ -382,11 +414,11 @@
       
         <div class="post-tags">
           
-            <a href="/tags/5-23/" rel="tag"># 5.23</a>
+            <a href="/tags/多线程/" rel="tag"># 多线程</a>
           
-            <a href="/tags/设计模式/" rel="tag"># 设计模式</a>
+            <a href="/tags/并发编程/" rel="tag"># 并发编程</a>
           
-            <a href="/tags/单例模式/" rel="tag"># 单例模式</a>
+            <a href="/tags/操作系统/" rel="tag"># 操作系统</a>
           
         </div>
       
@@ -399,8 +431,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/05/23/设计模式之工厂模式/" rel="next" title="设计模式之工厂模式">
-                <i class="fa fa-chevron-left"></i> 设计模式之工厂模式
+              <a href="/2017/09/24/Netty-我很有freestyle（一）/" rel="next" title="Netty:我很有freestyle（一）">
+                <i class="fa fa-chevron-left"></i> Netty:我很有freestyle（一）
               </a>
             
           </div>
@@ -409,8 +441,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2017/05/25/设计模式之观察者模式/" rel="prev" title="设计模式之观察者模式">
-                设计模式之观察者模式 <i class="fa fa-chevron-right"></i>
+              <a href="/2017/09/25/内核线程与用户线程/" rel="prev" title="内核线程与用户线程">
+                内核线程与用户线程 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -567,7 +599,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#单例模式"><span class="nav-number">1.</span> <span class="nav-text">单例模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-模式动机"><span class="nav-number">1.1.</span> <span class="nav-text">1. 模式动机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-模式定义"><span class="nav-number">1.2.</span> <span class="nav-text">2. 模式定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-模式结构"><span class="nav-number">1.3.</span> <span class="nav-text">3. 模式结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-代码分析"><span class="nav-number">1.4.</span> <span class="nav-text">4. 代码分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-模式分析"><span class="nav-number">1.5.</span> <span class="nav-text">5. 模式分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-应用实例"><span class="nav-number">1.6.</span> <span class="nav-text">6. 应用实例</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、什么是进程"><span class="nav-number">1.</span> <span class="nav-text">一、什么是进程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#（一）进程的特征"><span class="nav-number">1.1.</span> <span class="nav-text">（一）进程的特征</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、什么是线程"><span class="nav-number">2.</span> <span class="nav-text">二、什么是线程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#（一）线程的引入"><span class="nav-number">2.1.</span> <span class="nav-text">（一）线程的引入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（二）线程—调度和分派的基本单位"><span class="nav-number">2.2.</span> <span class="nav-text">（二）线程—调度和分派的基本单位</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（三）进程和线程的比较"><span class="nav-number">2.3.</span> <span class="nav-text">（三）进程和线程的比较</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#调度的基本单位"><span class="nav-number">2.3.1.</span> <span class="nav-text">调度的基本单位</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#并发性"><span class="nav-number">2.3.2.</span> <span class="nav-text">并发性</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#拥有资源。进程可以拥有资源"><span class="nav-number">2.3.3.</span> <span class="nav-text">拥有资源。进程可以拥有资源</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#独立性"><span class="nav-number">2.3.4.</span> <span class="nav-text">独立性</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#系统开销"><span class="nav-number">2.3.5.</span> <span class="nav-text">系统开销</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#多处理机系统"><span class="nav-number">2.3.6.</span> <span class="nav-text">多处理机系统</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>

@@ -53,7 +53,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Java,NIO," />
 
 
 
@@ -69,16 +69,18 @@
 
 
 
-<meta name="description" content="天下事有难易乎？为之，则难者亦易矣；不为，则易者亦难矣。">
-<meta property="og:type" content="website">
-<meta property="og:title" content="小排骨和他的小霸王学习机">
-<meta property="og:url" content="https://LINhunger.github.io/tags/Java基础/index.html">
+<meta name="description" content="虽然NIO的出现，对java高并发编程提供的更好的实现方式，但是原生的NIO所提供的API并没有我们想象的那么好用。原生NIO的API复杂难懂，并且需要超强的并发编程功底，否则很难写出高效稳定的实现。下面，我们来列举一些使用NIO编程将会遇见的坑：">
+<meta name="keywords" content="Java,NIO">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java NIO 从入门到放弃">
+<meta property="og:url" content="https://LINhunger.github.io/2017/09/24/Java-NIO-从入门到放弃/index.html">
 <meta property="og:site_name" content="小排骨和他的小霸王学习机">
-<meta property="og:description" content="天下事有难易乎？为之，则难者亦易矣；不为，则易者亦难矣。">
+<meta property="og:description" content="虽然NIO的出现，对java高并发编程提供的更好的实现方式，但是原生的NIO所提供的API并没有我们想象的那么好用。原生NIO的API复杂难懂，并且需要超强的并发编程功底，否则很难写出高效稳定的实现。下面，我们来列举一些使用NIO编程将会遇见的坑：">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-09-25T12:34:10.030Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="小排骨和他的小霸王学习机">
-<meta name="twitter:description" content="天下事有难易乎？为之，则难者亦易矣；不为，则易者亦难矣。">
+<meta name="twitter:title" content="Java NIO 从入门到放弃">
+<meta name="twitter:description" content="虽然NIO的出现，对java高并发编程提供的更好的实现方式，但是原生的NIO所提供的API并没有我们想象的那么好用。原生NIO的API复杂难懂，并且需要超强的并发编程功底，否则很难写出高效稳定的实现。下面，我们来列举一些使用NIO编程将会遇见的坑：">
 
 
 
@@ -108,13 +110,13 @@
 
 
 
-  <link rel="canonical" href="https://LINhunger.github.io/tags/Java基础/"/>
+  <link rel="canonical" href="https://LINhunger.github.io/2017/09/24/Java-NIO-从入门到放弃/"/>
 
 
 
 
 
-  <title>标签: Java基础 | 小排骨和他的小霸王学习机</title>
+  <title>Java NIO 从入门到放弃 | 小排骨和他的小霸王学习机</title>
   
 
 
@@ -133,7 +135,7 @@
     
   
 
-  <div class="container sidebar-position-left ">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -255,166 +257,192 @@
           <div id="content" class="content">
             
 
+  <div id="posts" class="posts-expand">
+    
+
+  
+
   
   
   
-  <div class="post-block tag">
-
-    <div id="posts" class="posts-collapse">
-      <div class="collection-title">
-        <h1>Java基础<small>标签</small>
-        </h1>
-      </div>
-
-      
-        
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://LINhunger.github.io/2017/09/24/Java-NIO-从入门到放弃/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="林寒弋">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/touxiang.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小排骨和他的小霸王学习机">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/2017/09/24/JavaIO流之NIO（三）/" itemprop="url">
-              
-                <span itemprop="name">JavaIO流之NIO（三）</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline" style="font-size:-webkit-xxx-large">Java NIO 从入门到放弃</h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-09-24T15:14:17+08:00"
-              content="2017-09-24" >
-          09-24
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-24T21:12:21+08:00">
+                2017-09-24
+              </time>
+            
 
-    </header>
-  </article>
+            
 
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/09/24/JavaIO流之NIO（二）/" itemprop="url">
-              
-                <span itemprop="name">JavaIO流之NIO（二）</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-09-24T11:39:51+08:00"
-              content="2017-09-24" >
-          09-24
-        </time>
-      </div>
-
-    </header>
-  </article>
-
+      
 
       
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/08/16/JavaNIO/" itemprop="url">
-              
-                <span itemprop="name">JavaIO流之NIO(一)</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-08-16T10:10:18+08:00"
-              content="2017-08-16" >
-          08-16
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-      
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/07/27/JavaIO流/" itemprop="url">
-              
-                <span itemprop="name">JavaIO流</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-07-27T10:10:18+08:00"
-              content="2017-07-27" >
-          07-27
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-      
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/07/24/Java泛型/" itemprop="url">
-              
-                <span itemprop="name">Java泛型</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-07-24T19:38:44+08:00"
-              content="2017-07-24" >
-          07-24
-        </time>
-      </div>
-
-    </header>
-  </article>
-
+        <p>虽然NIO的出现，对java高并发编程提供的更好的实现方式，但是原生的NIO所提供的API并没有我们想象的那么好用。原生NIO的API复杂难懂，并且需要超强的并发编程功底，否则很难写出高效稳定的实现。下面，我们来列举一些使用NIO编程将会遇见的坑：</p>
+<a id="more"></a>
+<h4 id="NIO代码实现方面的一些缺点"><a href="#NIO代码实现方面的一些缺点" class="headerlink" title="NIO代码实现方面的一些缺点"></a>NIO代码实现方面的一些缺点</h4><ol>
+<li><h5 id="Selector-selectedKeys-产生太多垃圾："><a href="#Selector-selectedKeys-产生太多垃圾：" class="headerlink" title="Selector.selectedKeys()产生太多垃圾："></a>Selector.selectedKeys()产生太多垃圾：</h5><p>NIO使用HashSet存储selectedKeys.</p>
+<p>优化：Netty使用双数组代替HashSet存储selectedKeys.</p>
+</li>
+<li><h5 id="Nio的代码到处是synchronized-⽐如allocate-direct-buffer和Selector-wakeup-："><a href="#Nio的代码到处是synchronized-⽐如allocate-direct-buffer和Selector-wakeup-：" class="headerlink" title="Nio的代码到处是synchronized (⽐如allocate direct buffer和Selector.wakeup())："></a>Nio的代码到处是synchronized (⽐如allocate direct buffer和Selector.wakeup())：</h5><p>wakeup调用多了锁竞争严重并且开销巨大，wakeup调用少了容易导致select时不必要的阻塞。</p>
+<p>优化：Netty Native Transport中锁少了很多。</p>
+</li>
+<li><h5 id="fdToKey映射："><a href="#fdToKey映射：" class="headerlink" title="fdToKey映射："></a>fdToKey映射：</h5><p>EPollSelectImpl#faToKey维持这所有的fd（描述符）对应SelectionKey的映射，是一个HashMap，想象一下：单机几十万的连接的场景，HashMap是如何从默认size = 16，一步步rehash。。。</p>
+</li>
+<li><h5 id="Selector在Linux平台是Epoll-LT-水平触发-实现："><a href="#Selector在Linux平台是Epoll-LT-水平触发-实现：" class="headerlink" title="Selector在Linux平台是Epoll LT(水平触发)实现："></a>Selector在Linux平台是Epoll LT(水平触发)实现：</h5><p>优化：Netty Native Transport支持Epoll ET(边缘触发).</p>
+</li>
+<li><h5 id="Direct-Buffers事实上开始有GC管理"><a href="#Direct-Buffers事实上开始有GC管理" class="headerlink" title="Direct Buffers事实上开始有GC管理:"></a>Direct Buffers事实上开始有GC管理:</h5><p>DirectByteBuffer.cleaner这个虚引⽤用负责free direct memory, DirectByteBuffer只是个壳子, 如果这个壳子熬过的新生代的年龄然后晋升到老年代的话将是一件令人伤心的事情。</p>
+<p>优化：Netty的UnpooledUnsafeNoCleanerDirectByteBuf去掉了cleaner, 由Netty框架维护引用计数 来实时的去释放.</p>
+</li>
+</ol>
+<p>综上所述，Netty才是我们需要重点关注的东西。</p>
 
       
     </div>
+    
+    
+    
 
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/NIO/" rel="tag"># NIO</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/24/JavaIO流之NIO（三）/" rel="next" title="JavaIO流之NIO（三）">
+                <i class="fa fa-chevron-left"></i> JavaIO流之NIO（三）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/24/Netty-我很有freestyle（一）/" rel="prev" title="Netty:我很有freestyle（一）">
+                Netty:我很有freestyle（一） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -422,6 +450,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
         </div>
         
@@ -442,8 +474,19 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            <!--文章目录-->
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            <!--站点概览-->
+            站点概况
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           
             <img class="site-author-image" itemprop="image"
@@ -525,6 +568,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#NIO代码实现方面的一些缺点"><span class="nav-number">1.</span> <span class="nav-text">NIO代码实现方面的一些缺点</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Selector-selectedKeys-产生太多垃圾："><span class="nav-number">1.1.</span> <span class="nav-text">Selector.selectedKeys()产生太多垃圾：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Nio的代码到处是synchronized-⽐如allocate-direct-buffer和Selector-wakeup-："><span class="nav-number">1.2.</span> <span class="nav-text">Nio的代码到处是synchronized (⽐如allocate direct buffer和Selector.wakeup())：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#fdToKey映射："><span class="nav-number">1.3.</span> <span class="nav-text">fdToKey映射：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Selector在Linux平台是Epoll-LT-水平触发-实现："><span class="nav-number">1.4.</span> <span class="nav-text">Selector在Linux平台是Epoll LT(水平触发)实现：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Direct-Buffers事实上开始有GC管理"><span class="nav-number">1.5.</span> <span class="nav-text">Direct Buffers事实上开始有GC管理:</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

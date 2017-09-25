@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="多线程,并发编程,操作系统," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="线程已在许多系统中实现，但各个系统的实现方式并不完全相同。目前，线程的主要形式有两种，分别是内核支持线程以及用户级线程。下面，我们来分析一下两种线程类型的特征以及优缺点。">
+<meta name="keywords" content="多线程,并发编程,操作系统">
+<meta property="og:type" content="article">
+<meta property="og:title" content="内核线程与用户线程">
+<meta property="og:url" content="https://LINhunger.github.io/2017/09/25/内核线程与用户线程/index.html">
+<meta property="og:site_name" content="小排骨和他的小霸王学习机">
+<meta property="og:description" content="线程已在许多系统中实现，但各个系统的实现方式并不完全相同。目前，线程的主要形式有两种，分别是内核支持线程以及用户级线程。下面，我们来分析一下两种线程类型的特征以及优缺点。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-25/96073668.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-25/95525084.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-25/2075833.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-26/94733527.jpg">
+<meta property="og:updated_time" content="2017-09-25T16:37:15.077Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="内核线程与用户线程">
+<meta name="twitter:description" content="线程已在许多系统中实现，但各个系统的实现方式并不完全相同。目前，线程的主要形式有两种，分别是内核支持线程以及用户级线程。下面，我们来分析一下两种线程类型的特征以及优缺点。">
+<meta name="twitter:image" content="http://opmjieyki.bkt.clouddn.com/17-9-25/96073668.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '2HS2W2NK4P',
+      apiKey: '161bd5753774a3f862efb9e010c5a870',
+      indexName: 'hunger_blog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://LINhunger.github.io/2017/09/25/内核线程与用户线程/"/>
+
+
+
+
+
+  <title>内核线程与用户线程 | 小排骨和他的小霸王学习机</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小排骨和他的小霸王学习机</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">天下事有难易乎？为之，则难者亦易矣；不为，则易者亦难矣。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-主页">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            主页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-归档">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-分类">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://LINhunger.github.io/2017/09/25/内核线程与用户线程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="林寒弋">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/touxiang.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小排骨和他的小霸王学习机">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline" style="font-size:-webkit-xxx-large">内核线程与用户线程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-25T20:39:10+08:00">
+                2017-09-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/操作系统/" itemprop="url" rel="index">
+                    <span itemprop="name">操作系统</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>线程已在许多系统中实现，但各个系统的实现方式并不完全相同。目前，线程的主要形式有两种，分别是内核支持线程以及用户级线程。下面，我们来分析一下两种线程类型的特征以及优缺点。</p>
+<a id="more"></a>
+<h3 id="一、内核支持线程（KST）"><a href="#一、内核支持线程（KST）" class="headerlink" title="一、内核支持线程（KST）"></a>一、内核支持线程（KST）</h3><p>在OS中的所有进程，无论是系统进程还是用户进程，都是在操作系统内核的支持下运行的，是与内核紧密相关的。而内核支持线程KST同样也是在内核的支持下运行的，他们的创建、阻塞、撤销、切换等，都是在内核空间实现。为了对内核线程进行控制和管理，在内核空间也为每一块内核线程设置了一个线程控制块，内核线程根据该控制块感知某线程的存在，并对其加以控制。</p>
+<h4 id="（一）内核线程的优点"><a href="#（一）内核线程的优点" class="headerlink" title="（一）内核线程的优点"></a>（一）内核线程的优点</h4><ol>
+<li>在多处理器中，内核能够同时调度同一进程中的多个线程<strong>并行</strong>执行。</li>
+<li>如果进程中一个线程阻塞了，内核可以调度该进程的其他线程占有处理器运行，也可以运行其他进程中的线程。</li>
+<li>内核支持线程具有很小的数据结构和堆栈，线程的切换比较快（好像没那么快），切换开销小。</li>
+<li>内核本身采用多线程技术，可以提高系统的执行效率和速度。</li>
+</ol>
+<h4 id="（二）内核线程的缺点"><a href="#（二）内核线程的缺点" class="headerlink" title="（二）内核线程的缺点"></a>（二）内核线程的缺点</h4><p>内核线程的主要缺点：对于<strong>用户的线程</strong>切换而言，其模式切换的开销较大，<strong>在同一个进程中，从一个线程切换到另一个线程，需要从用户态转到内核态，在从内核态切换到另一个线程，接着再转回用户态。</strong>这是因为用户进程的线程以用户态进行，而线程的调度和管理是在内核实现的，所以这样切换的成本就比较高。</p>
+<h3 id="二、用户级线程（ULT）"><a href="#二、用户级线程（ULT）" class="headerlink" title="二、用户级线程（ULT）"></a>二、用户级线程（ULT）</h3><p>用户级线程是在用户空间实现的。对线程的创建、撤销、同步与通信功能，都无需得到内核的支持，即用户级线程是与内核无关的。在一个系统中，用户级线程的数目可以达到数百个至数千个。<strong>由于这些线程的控制块都是设置在用户空间，而线程所执行的操作也无需得到内核的帮助，</strong>因而内核完全不知道用户级线程的存在。</p>
+<h4 id="（一）用户级线程的优点"><a href="#（一）用户级线程的优点" class="headerlink" title="（一）用户级线程的优点"></a>（一）用户级线程的优点</h4><ol>
+<li>线程切换不需要转换到内核空间。就一个进程而言，其所有线程的管理数据结构均在该进程的用户空间中，管理线程切换的线程库也在用户地址空间运行，因此进程不必切换到内核模式去做线程管理，从而节省了模式开销。</li>
+<li>调度算法是进程专用的。在不干扰OS调度的情况下，可以自定义调度算法，对自己的线程进行管理的调度，而与OS的低级调度算法是无关的。</li>
+<li>用户级线程的实现与OS平台无关。用户级线程甚至可以在不支持线程机制的操作平台进行（但是好像并没有什么卵用）。</li>
+</ol>
+<h4 id="（二）用户级线程的缺点"><a href="#（二）用户级线程的缺点" class="headerlink" title="（二）用户级线程的缺点"></a>（二）用户级线程的缺点</h4><ol>
+<li>系统调用的阻塞问题。在基于进程机制的OS中，如果如果一个线程阻塞，那么该进程内所有的线程都会阻塞。<strong>统一进程内线程的并行在这不存在。</strong></li>
+<li>无法利用多核优势。</li>
+</ol>
+<h3 id="三、组合方式"><a href="#三、组合方式" class="headerlink" title="三、组合方式"></a>三、组合方式</h3><p>用户线程通过时分多路复用内核技术，实现了用户级线程加内核支持线程的结合。从而形成了三种不同的模型分别是：一对一、多对一、多对多模型。</p>
+<h4 id="（一）多对一模型"><a href="#（一）多对一模型" class="headerlink" title="（一）多对一模型"></a>（一）多对一模型</h4><p>即是将所有的用户线程（同一个进程）映射到一个内核控制线程。对这些线程的调度也是在该进程的用户空间进行。仅当用户线程需要访问内核时，才映射到一个内核控制线程，但每次只允许一个线程进行映射。</p>
+<p>该模型的主要优点就是线程管理的开销小，效率高；缺点就是只要有一个线程阻塞，整个进程就会阻塞。因为在任意时刻，只有一个线程可以访问内核，所以无法利用多处理机的优势。（对应前面的用户级线程）</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-9-25/96073668.jpg" alt=""></p>
+<h4 id="（二）一对一模型"><a href="#（二）一对一模型" class="headerlink" title="（二）一对一模型"></a>（二）一对一模型</h4><p>即是，每一个用户线程都会映射到一个内核控制线程。每一个用户线程都有一个内核线程与之连接。</p>
+<p>该模型的主要优点就是当同一进程的一个线程阻塞时，不会影响进程内的其他线程，具有很好的并发功能，并可以利用多处理机的优点；缺点就是每创建一个用户线程，就需要创建一个内核线程，开销较大，也限制了操作系统的线程数。</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-9-25/95525084.jpg" alt=""></p>
+<h4 id="（三）多对多模型"><a href="#（三）多对多模型" class="headerlink" title="（三）多对多模型"></a>（三）多对多模型</h4><p>即将许多用户线程映射到同样数量或更少数量的内核线程上。该模结合了上述两种模型的特点，它可以像一对一模型那样，使一个进程的多个线程并行地运行在多处理机系统上，也可以像多对一模型，减少线程的管理开销。</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-9-25/2075833.jpg" alt=""></p>
+<h3 id="四、线程的实现"><a href="#四、线程的实现" class="headerlink" title="四、线程的实现"></a>四、线程的实现</h3><p>不管是进程还是线程，都必须之间或间接地获得内核的支持。</p>
+<h4 id="（一）内核支持线程的实现"><a href="#（一）内核支持线程的实现" class="headerlink" title="（一）内核支持线程的实现"></a>（一）内核支持线程的实现</h4><p>在仅设置了内核支持线程中，一种可能的控制方法就是：</p>
+<ol>
+<li>系统在创建线程时，便为它分配一个任务数据区（PTDA）。</li>
+<li>任务数据区中包括若干个线程控制块的TCB空间。在每一个TCB中可保存线程标识符、优先级、线程运行的CPU状态等信息。虽然这些信息与用户级线程TCB中的信息相同，但是现在却被保存在内核空间中。</li>
+<li>每当进程要创建一个线程时，便为线程创建一个TCB，将有关信息填入该TCB中，并为之分配必要的资源，如为线程分配栈空间和局部存储区，于是新创建的线程便有条件立刻执行。</li>
+<li>内核线程的创建、销毁、切换和调度和进程十分相似。当然，线程的开销会比进程小很多。</li>
+</ol>
+<h4 id="（二）用户级线程的实现"><a href="#（二）用户级线程的实现" class="headerlink" title="（二）用户级线程的实现"></a>（二）用户级线程的实现</h4><p>引入轻量级进程（LWP）的概念,LWP属于用户级线程。每一个进程可以拥有多个LWP，同用户线程一样，LWP拥有自己的数据结构（如TCB）。不同的是，<strong>LWP可以通过系统调用来获取内核提供的服务。</strong></p>
+<p>这样，当一个用户线程运行时，只需将他连接到一个LWP上，此时它便有了内核支持线程的所有属性。这种实现方式就是组合方式。</p>
+<p>在一个系统中可能用户级线程的数量很大，但是却不会设置太多的LWP。操作系统将LWP设置成了一个“线程池”。这样就可以使LWP实现多路复用。</p>
+<p>因此，只有连接到LWP的线程才能与内核进行通信，其余线程程或者阻塞或者等待LWP。</p>
+<p>这样，通过LWP可把用户级线程和内核线程连接起来，用户级线程可以通过LWP访问内核，但内核看到的始终是多个LWP而不是用户级线程。LWP实现了用户级线程和内核线程的隔离。</p>
+<p>当用户不需要与内核进行通信时，并不需要LWP；每一个需要通信的用户级线程都需要一个LWP.</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-9-26/94733527.jpg" alt=""></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/多线程/" rel="tag"># 多线程</a>
+          
+            <a href="/tags/并发编程/" rel="tag"># 并发编程</a>
+          
+            <a href="/tags/操作系统/" rel="tag"># 操作系统</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/25/进程与线程/" rel="next" title="进程与线程">
+                <i class="fa fa-chevron-left"></i> 进程与线程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            <!--文章目录-->
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            <!--站点概览-->
+            站点概况
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          
+            <img class="site-author-image" itemprop="image"
+              src="/images/touxiang.jpg"
+              alt="林寒弋" style="height: 130px; max-width: 130px" />
+          
+            <p class="site-author-name" itemprop="name">林寒弋</p>
+            <p class="site-description motion-element" itemprop="description">天下事有难易乎？为之，则难者亦易矣；不为，则易者亦难矣。</p>
+        </div>
+
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives">
+            
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name"><!--日志-->文章</span>
+              </a>
+            </div>
+          
+
+          
+              <div class="site-state-item site-state-categories">
+                  <a href="/categories">
+                      <span class="site-state-item-count">3</span>
+                      <span class="site-state-item-name"><!-- 分类 -->分类</span>
+                  </a>
+              </div>
+          
+          
+              <div class="site-state-item site-state-tags">
+                  <a href="/tags">
+                      <span class="site-state-item-count">23</span>
+                      <span class="site-state-item-name"><!-- 标签 -->标签</span>
+                  </a>
+              </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LINhunger" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>GitHub</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.vcoder.top" title="直播demo" target="_blank">直播demo</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、内核支持线程（KST）"><span class="nav-number">1.</span> <span class="nav-text">一、内核支持线程（KST）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#（一）内核线程的优点"><span class="nav-number">1.1.</span> <span class="nav-text">（一）内核线程的优点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（二）内核线程的缺点"><span class="nav-number">1.2.</span> <span class="nav-text">（二）内核线程的缺点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、用户级线程（ULT）"><span class="nav-number">2.</span> <span class="nav-text">二、用户级线程（ULT）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#（一）用户级线程的优点"><span class="nav-number">2.1.</span> <span class="nav-text">（一）用户级线程的优点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（二）用户级线程的缺点"><span class="nav-number">2.2.</span> <span class="nav-text">（二）用户级线程的缺点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、组合方式"><span class="nav-number">3.</span> <span class="nav-text">三、组合方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#（一）多对一模型"><span class="nav-number">3.1.</span> <span class="nav-text">（一）多对一模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（二）一对一模型"><span class="nav-number">3.2.</span> <span class="nav-text">（二）一对一模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（三）多对多模型"><span class="nav-number">3.3.</span> <span class="nav-text">（三）多对多模型</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四、线程的实现"><span class="nav-number">4.</span> <span class="nav-text">四、线程的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#（一）内核支持线程的实现"><span class="nav-number">4.1.</span> <span class="nav-text">（一）内核支持线程的实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（二）用户级线程的实现"><span class="nav-number">4.2.</span> <span class="nav-text">（二）用户级线程的实现</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">林寒弋</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.2</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.2"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

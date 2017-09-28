@@ -53,7 +53,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Java,NIO,Netty," />
+  <meta name="keywords" content="NIO,Java,Netty," />
 
 
 
@@ -69,18 +69,35 @@
 
 
 
-<meta name="description" content="github地址：https://github.com/LINhunger/netty-learning">
-<meta name="keywords" content="Java,NIO,Netty">
+<meta name="description" content="上一节我们介绍了Netty中个组件的大致概念及作用，在本节，我们将详细的讨论Netty的线程模型。">
+<meta name="keywords" content="NIO,Java,Netty">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Netty:我很有freestyle（三）">
 <meta property="og:url" content="https://LINhunger.github.io/2017/09/27/Netty-我很有freestyle（三）/index.html">
 <meta property="og:site_name" content="小排骨和他的小霸王学习机">
-<meta property="og:description" content="github地址：https://github.com/LINhunger/netty-learning">
+<meta property="og:description" content="上一节我们介绍了Netty中个组件的大致概念及作用，在本节，我们将详细的讨论Netty的线程模型。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-09-27T07:55:15.114Z">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-28/62979562.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-28/19726902.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-28/25278648.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-28/99115450.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-28/74746942.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-28/57825043.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-28/83457613.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-28/80809897.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-28/9272270.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-28/74343571.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-28/67927065.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-28/98283359.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-28/21805647.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-28/10929445.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-28/76037744.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-28/28968239.jpg">
+<meta property="og:updated_time" content="2017-09-28T10:21:20.200Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Netty:我很有freestyle（三）">
-<meta name="twitter:description" content="github地址：https://github.com/LINhunger/netty-learning">
+<meta name="twitter:description" content="上一节我们介绍了Netty中个组件的大致概念及作用，在本节，我们将详细的讨论Netty的线程模型。">
+<meta name="twitter:image" content="http://opmjieyki.bkt.clouddn.com/17-9-28/62979562.jpg">
 
 
 
@@ -360,7 +377,77 @@
       
 
       
-        <a id="more"></a>
+        <p>上一节我们介绍了Netty中个组件的大致概念及作用，在本节，我们将详细的讨论Netty的线程模型。</p>
+<a id="more"></a>
+<h3 id="一、服务端线程模型"><a href="#一、服务端线程模型" class="headerlink" title="一、服务端线程模型"></a>一、服务端线程模型</h3><h4 id="（一）多线程多Reactor"><a href="#（一）多线程多Reactor" class="headerlink" title="（一）多线程多Reactor"></a>（一）多线程多Reactor</h4><p>事实上，Netty的线程模型与前面介绍的Reactor线程模型类似，不一样的是，Netty使用的线程模式是多线程多Reactor的模式。</p>
+<p>即是一个主Reactor负责监控所有的连接请求，多个子Reactor负责监控并处理读写请求，减轻了主Reactor的压力。</p>
+<p>并且每个子Reactor分别属于一个独立的线程，每个成功连接后的Channel的所有操作都有同一个线程处理。这样保证了同一请求的所有状态和上下文都在同一个线程内，避免了不必要的上下文切换。</p>
+<p>下面是多线程多Reactor的模式示意图：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-9-28/62979562.jpg" alt=""></p>
+<p>利用主从NIO线程模型，可以解决一个服务器监听线程无法有效处理所有客户端连接的性能不足问题。</p>
+<p>它的工作流程如下：</p>
+<ol>
+<li>从主线程中随机选择一个Reactor线程作为Acceptor线程，用于绑定监听端口，接受客户端连接；</li>
+<li>Acceptor线程接受客户端连接请求之后创建新的SocketChannel，将其注册到主线程池的其他线程上，由其负责接入认证、IP黑白名单过滤、握手等操作；</li>
+<li>等步骤2完成之后，业务层的链路正式建立，将ScoketChannel从主线程的Reactor线程的多路复用器上摘除，重新注册到Sub线程池的线程上，用于处理IO的读写操作。</li>
+</ol>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-9-28/19726902.jpg" alt=""></p>
+<h4 id="（二）源码解读"><a href="#（二）源码解读" class="headerlink" title="（二）源码解读"></a>（二）源码解读</h4><h5 id="1-创建服务端代码"><a href="#1-创建服务端代码" class="headerlink" title="1. 创建服务端代码"></a>1. 创建服务端代码</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bind</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">    <span class="comment">//EventLoopGroup是用来处理IO操作的多线程事件循环器</span></div><div class="line">    <span class="comment">//bossGroup 用来接收进来的连接</span></div><div class="line">    EventLoopGroup bossGroup = <span class="keyword">new</span> NioEventLoopGroup();</div><div class="line">    <span class="comment">//workerGroup 用来处理已经被接收的连接</span></div><div class="line">    EventLoopGroup workerGroup = <span class="keyword">new</span> NioEventLoopGroup();</div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">        <span class="comment">//启动 NIO 服务的配置类</span></div><div class="line">        ServerBootstrap b = <span class="keyword">new</span> ServerBootstrap();</div><div class="line">        b.group(bossGroup, workerGroup)</div><div class="line">                <span class="comment">//配置 Channel</span></div><div class="line">                .channel(NioServerSocketChannel.class)</div><div class="line">                .childHandler(<span class="keyword">new</span> ChannelInitializer&lt;SocketChannel&gt;() &#123;</div><div class="line">                    <span class="meta">@Override</span></div><div class="line">                    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initChannel</span><span class="params">(SocketChannel ch)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">                        <span class="comment">// 注册handler</span></div><div class="line">                        ch.pipeline().addLast(<span class="keyword">new</span> HelloServerHandler());</div><div class="line">                    &#125;</div><div class="line">                &#125;)</div><div class="line">                .option(ChannelOption.SO_BACKLOG, <span class="number">128</span>)</div><div class="line">                .childOption(ChannelOption.SO_KEEPALIVE, <span class="keyword">true</span>);</div><div class="line"></div><div class="line">        <span class="comment">// 绑定端口，开始接收进来的连接</span></div><div class="line">        ChannelFuture f = b.bind(port).sync();</div><div class="line">        <span class="comment">// 等待服务器 socket 关闭 。</span></div><div class="line">        f.channel().closeFuture().sync();</div><div class="line">    &#125; <span class="keyword">finally</span> &#123;</div><div class="line">        <span class="comment">//回收线程</span></div><div class="line">        workerGroup.shutdownGracefully();</div><div class="line">        bossGroup.shutdownGracefully();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>通常情况下，服务端的创建是在用户进程启动时由main函数创建。在创建服务端的事件实例化了2个EventLoopGroup，1个EventLoopGroup就是一个EventLoop线程组，负责EventLoop的申请和释放。</p>
+<p>bossGroup线程组实际上即是Acceptor线程池，负责处理客户端的TCP连接请求，如果系统中只有一个服务器端口需要监听，那么建议bossGroup线程组线程数设置为1。</p>
+<p>workerGroup是真正负责IO读写操作的线程组，通过ServerBootstarp的group方法进行设置，用于后续的Channel绑定。</p>
+<h5 id="2-Acceptor线程绑定监听端口，启动NIO服务器"><a href="#2-Acceptor线程绑定监听端口，启动NIO服务器" class="headerlink" title="2. Acceptor线程绑定监听端口，启动NIO服务器"></a>2. Acceptor线程绑定监听端口，启动NIO服务器</h5><p><img src="http://opmjieyki.bkt.clouddn.com/17-9-28/25278648.jpg" alt=""></p>
+<p>其中，group()返回的就是bossGroup，它的next()方法用于从线程组中获取可用线程：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-9-28/99115450.jpg" alt=""></p>
+<p>服务端Channel创建完成之后，将其注册到多路复用器Selector上，用于接受客户端的TCP连接：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-9-28/74746942.jpg" alt=""></p>
+<h5 id="3-监听客户端连接"><a href="#3-监听客户端连接" class="headerlink" title="3. 监听客户端连接"></a>3. 监听客户端连接</h5><p>如果监听到客户端连接，则创建客户端ScoketChannel连接，重新注册到workerGroup的IO线程中。首先看Acceptor如何处理客户端的接入：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-9-28/57825043.jpg" alt=""></p>
+<p>调用unsafe的read（）方法，对于NioServerSocketChannel，它调用了NioMessageUnsafe的read()方法，代码如下：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-9-28/83457613.jpg" alt=""></p>
+<p>最终它会调用NioServerSocketChannel的doReadMessages方法，代码如下：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-9-28/80809897.jpg" alt=""></p>
+<p>由此创建了客户端连接SocketChannel，其中childEventLoopGroup就是之前的workerGroup,从中选择一个IO线程负责网络消息的读写。</p>
+<h5 id="4-将SocketChannel注册到多路复用器"><a href="#4-将SocketChannel注册到多路复用器" class="headerlink" title="4. 将SocketChannel注册到多路复用器"></a>4. 将SocketChannel注册到多路复用器</h5><p>选择IO线程之后，将SocketChannel注册到多路复用器上，监听READ操作。</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-9-28/9272270.jpg" alt=""></p>
+<h5 id="5-处理网络的IO读写事件"><a href="#5-处理网络的IO读写事件" class="headerlink" title="5. 处理网络的IO读写事件"></a>5. 处理网络的IO读写事件</h5><p><img src="http://opmjieyki.bkt.clouddn.com/17-9-28/74343571.jpg" alt=""></p>
+<h3 id="二、客户端线程模型"><a href="#二、客户端线程模型" class="headerlink" title="二、客户端线程模型"></a>二、客户端线程模型</h3><h4 id="（一）单线程单Reactor"><a href="#（一）单线程单Reactor" class="headerlink" title="（一）单线程单Reactor"></a>（一）单线程单Reactor</h4><p>相对于服务端，客户端的线程模型相对简单一些，它的工作原理入下：</p>
+<ol>
+<li>由用户线程负责初始化客户端资源，发起连接操作；</li>
+<li>如果连接成功，将SocketChannel注册到IO线程组的NioEventLoop线程中，监听读操作位；</li>
+<li>如果没有立即连接成功，将SocketChannel注册到IO线程组的NioEventLoop线程中，监听连接操作位；</li>
+<li>连接成功之后，修改监听位为READ，但是不需要切换线程。</li>
+</ol>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-9-28/67927065.jpg" alt=""></p>
+<h4 id="（二）源码解读-1"><a href="#（二）源码解读-1" class="headerlink" title="（二）源码解读"></a>（二）源码解读</h4><h5 id="1-客户端连接代码"><a href="#1-客户端连接代码" class="headerlink" title="1. 客户端连接代码"></a>1. 客户端连接代码</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">connect</span><span class="params">(String host, <span class="keyword">int</span> port)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">    EventLoopGroup workerGroup = <span class="keyword">new</span> NioEventLoopGroup();</div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">        Bootstrap b = <span class="keyword">new</span> Bootstrap();</div><div class="line">        b.group(workerGroup);</div><div class="line">        b.channel(NioSocketChannel.class);</div><div class="line">        b.option(ChannelOption.SO_KEEPALIVE, <span class="keyword">true</span>);</div><div class="line">        b.handler(<span class="keyword">new</span> ChannelInitializer&lt;SocketChannel&gt;() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initChannel</span><span class="params">(SocketChannel ch)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">                ch.pipeline().addLast(<span class="keyword">new</span> HelloClientHandler());</div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line">        <span class="comment">// 开始连接远程服务器.</span></div><div class="line">        ChannelFuture f = b.connect(host, port).sync();</div><div class="line"></div><div class="line">        <span class="comment">// 关闭channel断开后关闭回收资源</span></div><div class="line">        f.channel().closeFuture().sync();</div><div class="line">    &#125; <span class="keyword">finally</span> &#123;</div><div class="line">        workerGroup.shutdownGracefully();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们发现，客户端只要创建一个EventLoopGroup, 因为它不需要独立的线程区监听客户端连接，也没必要通过一个单独的客户端连接去连接服务器。</p>
+<blockquote>
+<p>Netty是异步事件驱动的NIO框架，它的连接和所有的IO操作都是异步的，因此不需要创建单独的连接线程。</p>
+</blockquote>
+<p>创建连接的相关代码入下：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-9-28/98283359.jpg" alt=""></p>
+<p>上面的代码绑定了客户端连接线程，当前的group()就是之前传入的EventLoopGroup，从中获取可用的IO线程EventLoop，然后作为参数设置到新创建的NioSocketChannel中。</p>
+<h5 id="2-发起连接操作"><a href="#2-发起连接操作" class="headerlink" title="2. 发起连接操作"></a>2. 发起连接操作</h5><p><img src="http://opmjieyki.bkt.clouddn.com/17-9-28/21805647.jpg" alt=""></p>
+<p>判断连接结果：</p>
+<ul>
+<li>如果连接成功，则调用pipeline().fireChannelActive()将监听位修改为READ。</li>
+<li>如果连接失败，则监听连接网络操作位修改SelectionKey.OP_CONNECT。</li>
+</ul>
+<h5 id="3-多路复用器轮询连接操作结果"><a href="#3-多路复用器轮询连接操作结果" class="headerlink" title="3. 多路复用器轮询连接操作结果"></a>3. 多路复用器轮询连接操作结果</h5><p>由NioEventLoop的多路复用器轮询连接操作结果：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-9-28/10929445.jpg" alt=""></p>
+<p>Selector发起轮询操作，判断连接结果，如果连接成功，重新设置监听位位READ。</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-9-28/76037744.jpg" alt=""></p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-9-28/28968239.jpg" alt=""></p>
+<p>判断连接操作结果，设置操作位为READ。</p>
+<h5 id="4-NioEventLoop线程负责IO读写（同服务端）"><a href="#4-NioEventLoop线程负责IO读写（同服务端）" class="headerlink" title="4. NioEventLoop线程负责IO读写（同服务端）"></a>4. NioEventLoop线程负责IO读写（同服务端）</h5><h3 id="三、Reactor线程与NioEventLoop"><a href="#三、Reactor线程与NioEventLoop" class="headerlink" title="三、Reactor线程与NioEventLoop"></a>三、Reactor线程与NioEventLoop</h3><h4 id="（一）NioEventLoop介绍"><a href="#（一）NioEventLoop介绍" class="headerlink" title="（一）NioEventLoop介绍"></a>（一）NioEventLoop介绍</h4><p>NioEventLoop是Netty的Reactor线程，它的职责如下:</p>
+<ol>
+<li>作为服务端的Acceptor线程，负责处理客户端的请求连接；</li>
+<li>作为客户端的Connect线程，负责注册监听连接操作位，用于判断异步连接结果；</li>
+<li>作为IO线程，监听网络读操作位，负责从ScoektChannel中读取报文；</li>
+<li>作为IO线程，负责向ScoketChannel写入报文发送给对方，如果发生写半包，会自动注册监听写事件，用于后续继续发送半包数据，直到全部数据发送完成；</li>
+<li>作为定时任务线程，可以执行定时任务，如链路空闲监测，和发送心跳信息等。</li>
+<li>作为线程执行器执行普通任务线程。（Runnable）</li>
+</ol>
 <p>github地址：<a href="https://github.com/LINhunger/netty-learning" target="_blank" rel="external">https://github.com/LINhunger/netty-learning</a></p>
 
       
@@ -379,9 +466,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Java/" rel="tag"># Java</a>
-          
             <a href="/tags/NIO/" rel="tag"># NIO</a>
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
           
             <a href="/tags/Netty/" rel="tag"># Netty</a>
           
@@ -456,8 +543,19 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            <!--文章目录-->
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            <!--站点概览-->
+            站点概况
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           
             <img class="site-author-image" itemprop="image"
@@ -539,6 +637,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、服务端线程模型"><span class="nav-number">1.</span> <span class="nav-text">一、服务端线程模型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#（一）多线程多Reactor"><span class="nav-number">1.1.</span> <span class="nav-text">（一）多线程多Reactor</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（二）源码解读"><span class="nav-number">1.2.</span> <span class="nav-text">（二）源码解读</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-创建服务端代码"><span class="nav-number">1.2.1.</span> <span class="nav-text">1. 创建服务端代码</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-Acceptor线程绑定监听端口，启动NIO服务器"><span class="nav-number">1.2.2.</span> <span class="nav-text">2. Acceptor线程绑定监听端口，启动NIO服务器</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-监听客户端连接"><span class="nav-number">1.2.3.</span> <span class="nav-text">3. 监听客户端连接</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-将SocketChannel注册到多路复用器"><span class="nav-number">1.2.4.</span> <span class="nav-text">4. 将SocketChannel注册到多路复用器</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#5-处理网络的IO读写事件"><span class="nav-number">1.2.5.</span> <span class="nav-text">5. 处理网络的IO读写事件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、客户端线程模型"><span class="nav-number">2.</span> <span class="nav-text">二、客户端线程模型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#（一）单线程单Reactor"><span class="nav-number">2.1.</span> <span class="nav-text">（一）单线程单Reactor</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（二）源码解读-1"><span class="nav-number">2.2.</span> <span class="nav-text">（二）源码解读</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-客户端连接代码"><span class="nav-number">2.2.1.</span> <span class="nav-text">1. 客户端连接代码</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-发起连接操作"><span class="nav-number">2.2.2.</span> <span class="nav-text">2. 发起连接操作</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-多路复用器轮询连接操作结果"><span class="nav-number">2.2.3.</span> <span class="nav-text">3. 多路复用器轮询连接操作结果</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-NioEventLoop线程负责IO读写（同服务端）"><span class="nav-number">2.2.4.</span> <span class="nav-text">4. NioEventLoop线程负责IO读写（同服务端）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、Reactor线程与NioEventLoop"><span class="nav-number">3.</span> <span class="nav-text">三、Reactor线程与NioEventLoop</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#（一）NioEventLoop介绍"><span class="nav-number">3.1.</span> <span class="nav-text">（一）NioEventLoop介绍</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

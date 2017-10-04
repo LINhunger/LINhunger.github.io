@@ -53,7 +53,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="NIO,Java,Netty," />
+  <meta name="keywords" content="Java,NIO,Netty," />
 
 
 
@@ -69,13 +69,13 @@
 
 
 
-<meta name="description" content="上一节我们介绍了Netty中个组件的大致概念及作用，在本节，我们将详细的讨论Netty的线程模型。">
-<meta name="keywords" content="NIO,Java,Netty">
+<meta name="description" content="线程模型篇：上一节我们介绍了Netty中个组件的大致概念及作用，在本节，我们将详细的讨论Netty的线程模型。">
+<meta name="keywords" content="Java,NIO,Netty">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Netty:我很有freestyle（三）">
 <meta property="og:url" content="https://LINhunger.github.io/2017/09/27/Netty-我很有freestyle（三）/index.html">
 <meta property="og:site_name" content="小排骨和他的小霸王学习机">
-<meta property="og:description" content="上一节我们介绍了Netty中个组件的大致概念及作用，在本节，我们将详细的讨论Netty的线程模型。">
+<meta property="og:description" content="线程模型篇：上一节我们介绍了Netty中个组件的大致概念及作用，在本节，我们将详细的讨论Netty的线程模型。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-28/62979562.jpg">
 <meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-28/19726902.jpg">
@@ -93,10 +93,10 @@
 <meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-28/10929445.jpg">
 <meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-28/76037744.jpg">
 <meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-9-28/28968239.jpg">
-<meta property="og:updated_time" content="2017-09-28T10:21:20.200Z">
+<meta property="og:updated_time" content="2017-10-02T02:15:34.848Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Netty:我很有freestyle（三）">
-<meta name="twitter:description" content="上一节我们介绍了Netty中个组件的大致概念及作用，在本节，我们将详细的讨论Netty的线程模型。">
+<meta name="twitter:description" content="线程模型篇：上一节我们介绍了Netty中个组件的大致概念及作用，在本节，我们将详细的讨论Netty的线程模型。">
 <meta name="twitter:image" content="http://opmjieyki.bkt.clouddn.com/17-9-28/62979562.jpg">
 
 
@@ -377,7 +377,7 @@
       
 
       
-        <p>上一节我们介绍了Netty中个组件的大致概念及作用，在本节，我们将详细的讨论Netty的线程模型。</p>
+        <p>线程模型篇：上一节我们介绍了Netty中个组件的大致概念及作用，在本节，我们将详细的讨论Netty的线程模型。</p>
 <a id="more"></a>
 <h3 id="一、服务端线程模型"><a href="#一、服务端线程模型" class="headerlink" title="一、服务端线程模型"></a>一、服务端线程模型</h3><h4 id="（一）多线程多Reactor"><a href="#（一）多线程多Reactor" class="headerlink" title="（一）多线程多Reactor"></a>（一）多线程多Reactor</h4><p>事实上，Netty的线程模型与前面介绍的Reactor线程模型类似，不一样的是，Netty使用的线程模式是多线程多Reactor的模式。</p>
 <p>即是一个主Reactor负责监控所有的连接请求，多个子Reactor负责监控并处理读写请求，减轻了主Reactor的压力。</p>
@@ -466,9 +466,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/NIO/" rel="tag"># NIO</a>
-          
             <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/NIO/" rel="tag"># NIO</a>
           
             <a href="/tags/Netty/" rel="tag"># Netty</a>
           
@@ -492,6 +492,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/29/Netty-我很有freestyle（四）/" rel="prev" title="Netty:我很有freestyle（四）">
+                Netty:我很有freestyle（四） <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -573,7 +577,7 @@
             
               <a href="/archives">
             
-                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-count">25</span>
                 <span class="site-state-item-name"><!--日志-->文章</span>
               </a>
             </div>

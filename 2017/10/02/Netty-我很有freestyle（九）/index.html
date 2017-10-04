@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,NIO,Netty," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="ChannelHandlerContext篇：ChannelHandlerContext代表ChannelHandler和ChannelPipeline之间的关联，并在ChannelHandler添加到ChannelPipeline时创建的一个实例。">
+<meta name="keywords" content="Java,NIO,Netty">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Netty:我很有freestyle（九）">
+<meta property="og:url" content="https://LINhunger.github.io/2017/10/02/Netty-我很有freestyle（九）/index.html">
+<meta property="og:site_name" content="小排骨和他的小霸王学习机">
+<meta property="og:description" content="ChannelHandlerContext篇：ChannelHandlerContext代表ChannelHandler和ChannelPipeline之间的关联，并在ChannelHandler添加到ChannelPipeline时创建的一个实例。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-10-3/87424158.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-10-3/95203230.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-10-3/68062891.jpg">
+<meta property="og:updated_time" content="2017-10-03T12:58:33.090Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Netty:我很有freestyle（九）">
+<meta name="twitter:description" content="ChannelHandlerContext篇：ChannelHandlerContext代表ChannelHandler和ChannelPipeline之间的关联，并在ChannelHandler添加到ChannelPipeline时创建的一个实例。">
+<meta name="twitter:image" content="http://opmjieyki.bkt.clouddn.com/17-10-3/87424158.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '2HS2W2NK4P',
+      apiKey: '161bd5753774a3f862efb9e010c5a870',
+      indexName: 'hunger_blog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://LINhunger.github.io/2017/10/02/Netty-我很有freestyle（九）/"/>
+
+
+
+
+
+  <title>Netty:我很有freestyle（九） | 小排骨和他的小霸王学习机</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小排骨和他的小霸王学习机</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">天下事有难易乎？为之，则难者亦易矣；不为，则易者亦难矣。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-主页">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            主页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-归档">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-分类">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://LINhunger.github.io/2017/10/02/Netty-我很有freestyle（九）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="林寒弋">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/touxiang.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小排骨和他的小霸王学习机">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline" style="font-size:-webkit-xxx-large">Netty:我很有freestyle（九）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-02T10:39:47+08:00">
+                2017-10-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/服务端编程/" itemprop="url" rel="index">
+                    <span itemprop="name">服务端编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>ChannelHandlerContext篇：ChannelHandlerContext代表ChannelHandler和ChannelPipeline之间的关联，并在ChannelHandler添加到ChannelPipeline时创建的一个实例。</p>
+<a id="more"></a>
+<h3 id="三、ChannelHandlerContext"><a href="#三、ChannelHandlerContext" class="headerlink" title="三、ChannelHandlerContext"></a>三、ChannelHandlerContext</h3><p>ChannelHandlerContext的主要功能是管理通过同一个ChannelPipeline关联的ChannelHandler之间的交互。</p>
+<p>ChannelHandlerContext有很多方法，其中一些方法也存在于Channel和ChannelPipeline上，但是有一点重要的不同：</p>
+<p>如果调用Channel或者ChannelPipeline上的这些方法，它们将沿着整个ChannelPipeline进行传播。</p>
+<p>而调用ChannelHandlerContext上的相同方法，则将从当前所关联的ChannelHandler开始，并且只会传播给位于该ChannelPipeline中的下一个<strong>能够处理该事件</strong>的ChannelHandler。</p>
+<p>ChannelHandlerContext API 总结如下：</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>alloc</td>
+<td>返回和这个实例相关联的Channel所配置的ByteBufAllocator</td>
+</tr>
+<tr>
+<td>bind</td>
+<td>绑定到给定的SocketAddress，并返回ChannelFuture</td>
+</tr>
+<tr>
+<td>channel</td>
+<td>返回绑定到这个实例的Channel</td>
+</tr>
+<tr>
+<td>close</td>
+<td>关闭Channel，并返回ChannelFuture</td>
+</tr>
+<tr>
+<td>connect</td>
+<td>连接给定的SocketAddress，并返回ChannelFuture</td>
+</tr>
+<tr>
+<td>deregister</td>
+<td>从之前分配的EventExecutor注销，并返回ChannelFuture</td>
+</tr>
+<tr>
+<td>disconnect</td>
+<td>从远程节点断开，并返回ChannelFuture</td>
+</tr>
+<tr>
+<td>executor</td>
+<td>返回调度事件的EventExecutor</td>
+</tr>
+<tr>
+<td>fireChannelActive</td>
+<td>触发对下一个ChannelInboundHandler上的 channelActive()方法（已连接）的调用</td>
+</tr>
+<tr>
+<td>fireChannelInactive</td>
+<td>触发对下一个ChannelInboundHandler上的 channelInactive()方法（已关闭）的调用</td>
+</tr>
+<tr>
+<td>fireChannelRead</td>
+<td>触发对下一个ChannelInboundHandler上的 channelRead()方法（已接收的消息）的调用</td>
+</tr>
+<tr>
+<td>fireChannelReadComplete</td>
+<td>触发对下一个ChannelInboundHandler上的 channelReadComplete()方法的调用</td>
+</tr>
+<tr>
+<td>fireChannelRegistered</td>
+<td>触发对下一个ChannelInboundHandler上的 fireChannelRegistered()方法的调用</td>
+</tr>
+<tr>
+<td>fireChannelUnregistered</td>
+<td>触发对下一个ChannelInboundHandler上的 fireChannelUnregistered()方法的调用</td>
+</tr>
+<tr>
+<td>fireChannelWritabilityChanged</td>
+<td>触发对下一个ChannelInboundHandler上的 fireChannelWritabilityChanged()方法的调用</td>
+</tr>
+<tr>
+<td>fireExceptionCaught</td>
+<td>触发对下一个ChannelInboundHandler上的 fireExceptionCaught(Throwable)方法的调用</td>
+</tr>
+<tr>
+<td>fireUserEventTriggered</td>
+<td>触发对下一个ChannelInboundHandler上的 fireUserEventTriggered(Object evt)方法的调用</td>
+</tr>
+<tr>
+<td>handler</td>
+<td>返回绑定到这个实例的ChannelHandler</td>
+</tr>
+<tr>
+<td>isRemoved</td>
+<td>如果所关联的ChannelHandler已经被从ChannelPipeline 中移除则返回true</td>
+</tr>
+<tr>
+<td>name</td>
+<td>返回这个实例的唯一名称</td>
+</tr>
+<tr>
+<td>pipeline</td>
+<td>返回这个实例所关联的ChannelPipeline</td>
+</tr>
+<tr>
+<td>read</td>
+<td>将数据从Channel读取到第一个入站缓冲区；如果读取成功则触发 一个channelRead事件，并（在最后一个消息被读取完成后） 通知ChannelInboundHandler 的 channelReadComplete (ChannelHandlerContext)方法</td>
+</tr>
+<tr>
+<td>write</td>
+<td>通过这个实例写入消息并经过 ChannelPipeline</td>
+</tr>
+<tr>
+<td>writeAndFlush</td>
+<td>通过这个实例写入并冲刷消息并经过 ChannelPipeline</td>
+</tr>
+</tbody>
+</table>
+<p>当使用ChannelHandlerContext的API时，有两个特点：</p>
+<ul>
+<li>ChannelHandlerContext和ChannelHandler之间的关联是永远不会改变的，所以，缓存对它的引用是安全的；</li>
+<li>相对于其他类的同名方法，ChannelHandlerContext的方法可以产生更短的事件流。</li>
+</ul>
+<h4 id="（一）使用ChannelHandlerContext"><a href="#（一）使用ChannelHandlerContext" class="headerlink" title="（一）使用ChannelHandlerContext"></a>（一）使用ChannelHandlerContext</h4><p>下面我们将讨论ChannelHandlerContext的用法，以及存在于ChannelHandlerContext、Channel和Channelpipeline上的方法的行为。</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-10-3/87424158.jpg" alt=""></p>
+<p>下面代码展示了，通过ChannelHandlerContext获取到Channel的引用。调用Channel上的write()方法将会导致写入事件从尾端到头部流经ChannelPipeline。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">ChannelHandlerContext ctx = context;</div><div class="line">Channel channel = ctx.channel();  </div><div class="line">channel.write(Unpooled.copiedBuffer(<span class="string">"Netty in Action"</span>, CharsetUtil.UTF_8));</div></pre></td></tr></table></figure>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-10-3/95203230.jpg" alt=""></p>
+<ol>
+<li>ChannelHandlerContext 方法调用。</li>
+<li>事件发送到了下一个 ChannelHandler。</li>
+<li>经过最后一个ChannelHandler后，事件从 ChannelPipeline 移除。</li>
+</ol>
+<p>下面展示了 从 ChannelHandlerContext 获取到 ChannelPipeline 的相同示例。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">ChannelHandlerContext ctx = context;</div><div class="line">ChannelPipeline pipeline = ctx.pipeline(); </div><div class="line">pipeline.write(Unpooled.copiedBuffer(<span class="string">"Netty in Action"</span>, CharsetUtil.UTF_8));</div></pre></td></tr></table></figure>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-10-3/68062891.jpg" alt=""></p>
+<ol>
+<li>事件传递给 ChannelPipeline 的第一个 ChannelHandler。</li>
+<li>ChannelHandler 通过关联的 ChannelHandlerContext 传递事件给 ChannelPipeline 中的 下一个。</li>
+<li>ChannelHandler 通过关联的 ChannelHandlerContext 传递事件给 ChannelPipeline 中的 下一个。</li>
+</ol>
+<h4 id="（二）高级用法"><a href="#（二）高级用法" class="headerlink" title="（二）高级用法"></a>（二）高级用法</h4><h5 id="1-协议转换"><a href="#1-协议转换" class="headerlink" title="1. 协议转换"></a>1. 协议转换</h5><p>正如前面所看到的，我们可以通过ChannelHandlerContext上的pipeline()方法来获得一个封闭的ChannelPipeline引用。这使得可以利用ChannelPipeline来修改ChannelPipeline的ChannelHandler，从而实现动态的协议切换。</p>
+<h5 id="2-保留引用"><a href="#2-保留引用" class="headerlink" title="2. 保留引用"></a>2. 保留引用</h5><p>另一种高级的用法是保持一个ChannelHandlerContext的引用以供稍后使用，这可能会发生在任何的ChannelHandler方法之外，甚至来自于不同的线程。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WriteHandler</span> <span class="keyword">extends</span> <span class="title">ChannelHandlerAdapter</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> ChannelHandlerContext ctx;</div><div class="line">    </div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handlerAdded</span><span class="params">(ChannelHandlerContext ctx)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.ctx = ctx;        </div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">send</span><span class="params">(String msg)</span> </span>&#123;</div><div class="line">        ctx.writeAndFlush(msg);  </div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="3-共享ChannelHandler"><a href="#3-共享ChannelHandler" class="headerlink" title="3. 共享ChannelHandler"></a>3. 共享ChannelHandler</h5><p>因为 ChannelHandler 可以属于多个 ChannelPipeline ,它可以绑定多个 ChannelHandlerContext 实例。然而,ChannelHandler 用于这种用法必须添加 <code>@Sharable</code> 注解。否则,试图将它添加到多个 ChannelPipeline 将引发一个异常。此外,它必须既是线程安全的又能安全地使用多个同时的通道(比如,连接)。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@ChannelHandler</span>.Sharable            </div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SharableHandler</span> <span class="keyword">extends</span> <span class="title">ChannelInboundHandlerAdapter</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelRead</span><span class="params">(ChannelHandlerContext ctx, Object msg)</span> </span>&#123;</div><div class="line">        System.out.println(<span class="string">"channel read message "</span> + msg);</div><div class="line">        ctx.fireChannelRead(msg);  </div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>使用<code>@Sharable</code>的话，要确定 ChannelHandler 是线程安全的。</p>
+</blockquote>
+<p><em>共享 ChannelHandler的原因</em></p>
+<p>要在多个 ChannelPipelines 上安装一个 ChannelHandler 以此来实现跨多个渠道收集统计数据的目的。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/NIO/" rel="tag"># NIO</a>
+          
+            <a href="/tags/Netty/" rel="tag"># Netty</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/02/Netty-我很有freestyle（八）/" rel="next" title="Netty:我很有freestyle（八）">
+                <i class="fa fa-chevron-left"></i> Netty:我很有freestyle（八）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/02/Netty-我很有freestyle（十）/" rel="prev" title="Netty:我很有freestyle（十）">
+                Netty:我很有freestyle（十） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            <!--文章目录-->
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            <!--站点概览-->
+            站点概况
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          
+            <img class="site-author-image" itemprop="image"
+              src="/images/touxiang.jpg"
+              alt="林寒弋" style="height: 130px; max-width: 130px" />
+          
+            <p class="site-author-name" itemprop="name">林寒弋</p>
+            <p class="site-description motion-element" itemprop="description">天下事有难易乎？为之，则难者亦易矣；不为，则易者亦难矣。</p>
+        </div>
+
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives">
+            
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name"><!--日志-->文章</span>
+              </a>
+            </div>
+          
+
+          
+              <div class="site-state-item site-state-categories">
+                  <a href="/categories">
+                      <span class="site-state-item-count">3</span>
+                      <span class="site-state-item-name"><!-- 分类 -->分类</span>
+                  </a>
+              </div>
+          
+          
+              <div class="site-state-item site-state-tags">
+                  <a href="/tags">
+                      <span class="site-state-item-count">23</span>
+                      <span class="site-state-item-name"><!-- 标签 -->标签</span>
+                  </a>
+              </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LINhunger" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>GitHub</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.vcoder.top" title="直播demo" target="_blank">直播demo</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#三、ChannelHandlerContext"><span class="nav-number">1.</span> <span class="nav-text">三、ChannelHandlerContext</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#（一）使用ChannelHandlerContext"><span class="nav-number">1.1.</span> <span class="nav-text">（一）使用ChannelHandlerContext</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（二）高级用法"><span class="nav-number">1.2.</span> <span class="nav-text">（二）高级用法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-协议转换"><span class="nav-number">1.2.1.</span> <span class="nav-text">1. 协议转换</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-保留引用"><span class="nav-number">1.2.2.</span> <span class="nav-text">2. 保留引用</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-共享ChannelHandler"><span class="nav-number">1.2.3.</span> <span class="nav-text">3. 共享ChannelHandler</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">林寒弋</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.2</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.2"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,NIO,Netty," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="Bootstrap篇：前面我们讨论的很多关于Netty的组件，而Bootstarp类的作用，就是将这些部分组织起来，成为一个可实际运行的程序。">
+<meta name="keywords" content="Java,NIO,Netty">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Netty:我很有freestyle（十）">
+<meta property="og:url" content="https://LINhunger.github.io/2017/10/02/Netty-我很有freestyle（十）/index.html">
+<meta property="og:site_name" content="小排骨和他的小霸王学习机">
+<meta property="og:description" content="Bootstrap篇：前面我们讨论的很多关于Netty的组件，而Bootstarp类的作用，就是将这些部分组织起来，成为一个可实际运行的程序。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-10-3/12533860.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-10-4/94571683.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-10-4/59013059.jpg">
+<meta property="og:updated_time" content="2017-10-04T13:02:47.112Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Netty:我很有freestyle（十）">
+<meta name="twitter:description" content="Bootstrap篇：前面我们讨论的很多关于Netty的组件，而Bootstarp类的作用，就是将这些部分组织起来，成为一个可实际运行的程序。">
+<meta name="twitter:image" content="http://opmjieyki.bkt.clouddn.com/17-10-3/12533860.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '2HS2W2NK4P',
+      apiKey: '161bd5753774a3f862efb9e010c5a870',
+      indexName: 'hunger_blog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://LINhunger.github.io/2017/10/02/Netty-我很有freestyle（十）/"/>
+
+
+
+
+
+  <title>Netty:我很有freestyle（十） | 小排骨和他的小霸王学习机</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小排骨和他的小霸王学习机</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">天下事有难易乎？为之，则难者亦易矣；不为，则易者亦难矣。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-主页">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            主页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-归档">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-分类">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://LINhunger.github.io/2017/10/02/Netty-我很有freestyle（十）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="林寒弋">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/touxiang.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小排骨和他的小霸王学习机">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline" style="font-size:-webkit-xxx-large">Netty:我很有freestyle（十）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-02T10:40:43+08:00">
+                2017-10-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/服务端编程/" itemprop="url" rel="index">
+                    <span itemprop="name">服务端编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Bootstrap篇：前面我们讨论的很多关于Netty的组件，而Bootstarp类的作用，就是将这些部分组织起来，成为一个可实际运行的程序。</p>
+<a id="more"></a>
+<h3 id="一、Bootstarp类型"><a href="#一、Bootstarp类型" class="headerlink" title="一、Bootstarp类型"></a>一、Bootstarp类型</h3><p>Netty包括两种不同类型的引导，分别是客户端类型与服务器类型。</p>
+<p>服务器类型致力于使用一个父Channel来接受来自客户端的连接，并创建子Channel以用于它们之间的通信；</p>
+<p>而客户端可能只需要一个单独的、没有父Channel的Channel来进行网络的所有交互。</p>
+<blockquote>
+<p><strong>为什么引导类是Cloneable的：</strong></p>
+<p>你有时会可能会需要多个具有类似配置或者完全相同配置的Channel。为了支持这种模式而又不为每个Channel都创建一个新的引导类实例，AbstractBootstarp被标记为了Cloneable。在一个已经配置完成的引导类实例上调用clone()方法将返回另一个可以立即使用的引导类实例。（new 了新的Bootstarp）</p>
+<p>注意：这种方式只会创建引导类实例的EventLoopGroup的一个浅拷贝，所以后者将在所有的克隆的Channel实例之间共享。这是可以接受的，因为通常这些克隆的Channel的生命周期都很短暂，一个典型的场景是—创建一个Channel以进行一次HTTP请求。</p>
+</blockquote>
+<h3 id="二、引导客户端和无连接协议"><a href="#二、引导客户端和无连接协议" class="headerlink" title="二、引导客户端和无连接协议"></a>二、引导客户端和无连接协议</h3><h4 id="（一）客户端引导方法"><a href="#（一）客户端引导方法" class="headerlink" title="（一）客户端引导方法"></a>（一）客户端引导方法</h4><p>下表是 Bootstrap 的常用方法，其中很多是继承自 AbstractBootstrap。</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>group</td>
+<td>设置 EventLoopGroup 用于处理所有的 Channel 的事件</td>
+</tr>
+<tr>
+<td>channel channelFactory</td>
+<td>channel() 指定 Channel 的实现类。如果类没有提供一个默认的构造函数,你可以调用 channelFactory() 来指定一个工厂类被 bind() 调用。</td>
+</tr>
+<tr>
+<td>localAddress</td>
+<td>指定应该绑定到本地地址 Channel。如果不提供,将由操作系统创建一个随机的。或者,您可以使用 bind() 或 connect()指定localAddress</td>
+</tr>
+<tr>
+<td>option</td>
+<td>设置 ChannelOption 应用于 新创建 Channel 的 ChannelConfig。这些选项将被 bind 或 connect 设置在通道,这取决于哪个被首先调用。这个方法在创建管道后没有影响。所支持 ChannelOption 取决于使用的管道类型。请参考9.6节和 ChannelConfig 的 API 文档 的 Channel 类型使用。</td>
+</tr>
+<tr>
+<td>attr</td>
+<td>这些选项将被 bind 或 connect 设置在通道,这取决于哪个被首先调用。这个方法在创建管道后没有影响。请参考9.6节。</td>
+</tr>
+<tr>
+<td>handler</td>
+<td>设置添加到 ChannelPipeline 中的 ChannelHandler 接收事件通知。</td>
+</tr>
+<tr>
+<td>clone</td>
+<td>创建一个当前 Bootstrap的克隆拥有原来相同的设置。</td>
+</tr>
+<tr>
+<td>remoteAddress</td>
+<td>设置远程地址。此外,您可以通过 connect() 指定</td>
+</tr>
+<tr>
+<td>connect</td>
+<td>连接到远端，返回一个 ChannelFuture, 用于通知连接操作完成</td>
+</tr>
+<tr>
+<td>bind</td>
+<td>将通道绑定并返回一个 ChannelFuture,用于通知绑定操作完成后,必须调用 Channel.connect() 来建立连接。</td>
+</tr>
+</tbody>
+</table>
+<h4 id="（二）如何引导客户端"><a href="#（二）如何引导客户端" class="headerlink" title="（二）如何引导客户端"></a>（二）如何引导客户端</h4><p>Bootstarp类负责给客户或应用程序创建Channel。</p>
+<p><a href="http://opmjieyki.bkt.clouddn.com/17-10-3/12533860.jpg" target="_blank" rel="external"><img src="http://opmjieyki.bkt.clouddn.com/17-10-3/12533860.jpg" alt="img"></a></p>
+<ol>
+<li>当 bind() 调用时，Bootstrap 将创建一个新的Channel, 当 connect() 调用在 Channel 来建立连接。</li>
+<li>当 connect() 调用时，Bootstrap 将创建一个新的Channel。</li>
+<li>新的 Channel。</li>
+</ol>
+<p>下面代码引导了一个使用NIO TCP传输的客户端：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">EventLoopGroup group = <span class="keyword">new</span> NioEventLoopGroup();</div><div class="line">Bootstrap bootstrap = <span class="keyword">new</span> Bootstrap(); <span class="comment">//1</span></div><div class="line">bootstrap.group(group) <span class="comment">//2</span></div><div class="line">    .channel(NioSocketChannel.class) <span class="comment">//3</span></div><div class="line">    .handler(<span class="keyword">new</span> SimpleChannelInboundHandler&lt;ByteBuf&gt;() &#123; <span class="comment">//4</span></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">channeRead0</span><span class="params">(</span></span></div><div class="line"><span class="function"><span class="params">            ChannelHandlerContext channelHandlerContext,</span></span></div><div class="line"><span class="function"><span class="params">            ByteBuf byteBuf)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">                System.out.println(<span class="string">"Received data"</span>);</div><div class="line">                byteBuf.clear();</div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line">ChannelFuture future = bootstrap.connect(</div><div class="line">    <span class="keyword">new</span> InetSocketAddress(<span class="string">"localhost"</span>, <span class="number">80</span>)); <span class="comment">//5</span></div><div class="line">future.addListener(<span class="keyword">new</span> ChannelFutureListener() &#123;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">operationComplete</span><span class="params">(ChannelFuture channelFuture)</span></span></div><div class="line"><span class="function">        <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">            <span class="keyword">if</span> (channelFuture.isSuccess()) &#123;</div><div class="line">                System.out.println(<span class="string">"Connection established"</span>);</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                System.err.println(<span class="string">"Connection attempt failed"</span>);</div><div class="line">                channelFuture.cause().printStackTrace();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;);</div></pre></td></tr></table></figure>
+<ol>
+<li>创建一个新的 Bootstrap 来创建和连接到新的客户端管道。</li>
+<li>指定 EventLoopGroup。</li>
+<li>指定 Channel 实现来使用。</li>
+<li>设置处理器给 Channel 的事件和数据。</li>
+<li>连接到远端主机。</li>
+</ol>
+<h3 id="三、引导服务器"><a href="#三、引导服务器" class="headerlink" title="三、引导服务器"></a>三、引导服务器</h3><h4 id="（一）引导服务器的方法"><a href="#（一）引导服务器的方法" class="headerlink" title="（一）引导服务器的方法"></a>（一）引导服务器的方法</h4><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>group</td>
+<td>设置 EventLoopGroup 用于 ServerBootstrap。这个 EventLoopGroup 提供 ServerChannel 的 I/O 并且接收 Channel</td>
+</tr>
+<tr>
+<td>channel channelFactory</td>
+<td>channel() 指定 Channel 的实现类。如果管道没有提供一个默认的构造函数,你可以提供一个 ChannelFactory。</td>
+</tr>
+<tr>
+<td>localAddress</td>
+<td>指定 ServerChannel 实例化的类。如果不提供,将由操作系统创建一个随机的。或者,您可以使用 bind() 或 connect()指定localAddress</td>
+</tr>
+<tr>
+<td>option</td>
+<td>指定一个 ChannelOption 来用于新创建的 ServerChannel 的 ChannelConfig 。这些选项将被设置在管道的 bind() 或 connect(),这取决于谁首先被调用。在此调用这些方法之后设置或更改 ChannelOption 是无效的。所支持 ChannelOption 取决于使用的管道类型。请参考9.6节和 ChannelConfig 的 API 文档 的 Channel 类型使用。</td>
+</tr>
+<tr>
+<td>childOption</td>
+<td>当管道已被接受，指定一个 ChannelOption 应用于 Channel 的 ChannelConfig。</td>
+</tr>
+<tr>
+<td>attr</td>
+<td>指定 ServerChannel 的属性。这些属性可以被 管道的 bind() 设置。当调用 bind() 之后，修改它们不会生效。</td>
+</tr>
+<tr>
+<td>childAttr</td>
+<td>应用属性到接收到的管道上。后续调用没有效果。</td>
+</tr>
+<tr>
+<td>handler</td>
+<td>设置添加到 ServerChannel 的 ChannelPipeline 中的 ChannelHandler。 具体详见 childHandler() 描述</td>
+</tr>
+<tr>
+<td>childHandler</td>
+<td>设置添加到接收到的 Channel 的 ChannelPipeline 中的 ChannelHandler。handler() 和 childHandler()之间的区别是前者是接收和处理ServerChannel，同时 childHandler() 添加处理器用于处理和接收 Channel。后者代表一个套接字绑定到一个远端。</td>
+</tr>
+<tr>
+<td>clone</td>
+<td>克隆 ServerBootstrap 用于连接到不同的远端，通过设置相同的原始 ServerBoostrap。</td>
+</tr>
+<tr>
+<td>bind</td>
+<td>绑定 ServerChannel 并且返回一个 ChannelFuture,用于 通知连接操作完成了（结果可以是成功或者失败）。</td>
+</tr>
+</tbody>
+</table>
+<p>ServerBootstrap 中的 childHandler(), childAttr() 和 childOption() 是常用的服务器应用的操作。具体来说,ServerChannel实现负责创建子 Channel,它代表接受连接。因此 引导 ServerChannel 的 ServerBootstrap ,提供这些方法来简化接收的 Channel 对 ChannelConfig 应用设置的任务。</p>
+<p>下图展示了ServerBootstarp在bind()后,创建了ServerChannel，后者管理大量的子Channel。</p>
+<p><a href="http://opmjieyki.bkt.clouddn.com/17-10-4/94571683.jpg" target="_blank" rel="external"><img src="http://opmjieyki.bkt.clouddn.com/17-10-4/94571683.jpg" alt="img"></a></p>
+<ol>
+<li>当调用 bind() 后 ServerBootstrap 将创建一个新的管道，这个管道将会在绑定成功后接收子管道。</li>
+<li>接收新连接给每个子管道。</li>
+<li>接收连接的 Channel。</li>
+</ol>
+<p>下面展示了服务器的引导过程。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">NioEventLoopGroup group = <span class="keyword">new</span> NioEventLoopGroup();</div><div class="line">ServerBootstrap bootstrap = <span class="keyword">new</span> ServerBootstrap(); <span class="comment">//1</span></div><div class="line">bootstrap.group(group) <span class="comment">//2</span></div><div class="line">    .channel(NioServerSocketChannel.class) <span class="comment">//3</span></div><div class="line">    .childHandler(<span class="keyword">new</span> SimpleChannelInboundHandler&lt;ByteBuf&gt;() &#123; <span class="comment">//4</span></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">channelRead0</span><span class="params">(ChannelHandlerContext ctx,</span></span></div><div class="line"><span class="function"><span class="params">            ByteBuf byteBuf)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">                System.out.println(<span class="string">"Reveived data"</span>);</div><div class="line">                byteBuf.clear();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    );</div><div class="line">ChannelFuture future = bootstrap.bind(<span class="keyword">new</span> InetSocketAddress(<span class="number">8080</span>)); <span class="comment">//5</span></div><div class="line">future.addListener(<span class="keyword">new</span> ChannelFutureListener() &#123;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">operationComplete</span><span class="params">(ChannelFuture channelFuture)</span></span></div><div class="line"><span class="function">        <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">            <span class="keyword">if</span> (channelFuture.isSuccess()) &#123;</div><div class="line">                System.out.println(<span class="string">"Server bound"</span>);</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                System.err.println(<span class="string">"Bound attempt failed"</span>);</div><div class="line">                channelFuture.cause().printStackTrace();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">);</div></pre></td></tr></table></figure>
+<ol>
+<li>创建要给新的 ServerBootstrap 来创建新的 SocketChannel 管道并绑定他们。</li>
+<li>指定 EventLoopGroup 用于从注册的 ServerChannel 中获取EventLoop 和接收到的管道。</li>
+<li>指定要使用的管道类。</li>
+<li>设置子处理器用于处理接收的管道的 I/O 和数据。</li>
+<li>通过配置引导来绑定管道。</li>
+</ol>
+<h3 id="四、从Channel引导客户端"><a href="#四、从Channel引导客户端" class="headerlink" title="四、从Channel引导客户端"></a>四、从Channel引导客户端</h3><p>有时你可能需要引导客户端 Channel 从另一个 Channel。这可能发生,如果您正在编写一个代理或从其他系统需要检索数据。</p>
+<p>你当然可以创建一个新的 Bootstrap 并连接远程主机,这个解决方案不一定有效。至少,你需要创建另一个 EventLoop 给新客户端 Channel 的,并且 Channel 将会需要在不同的 Thread 间进行上下文切换。</p>
+<p>幸运的是,由于 EventLoop 继承自 EventLoopGroup ,您可以通过传递 接收到的 Channel 的 EventLoop 到 Bootstrap 的 group() 方法。这允许客户端 Channel 来操作 相同的 EventLoop,这样就能消除了额外的线程创建和所有相关的上下文切换的开销。</p>
+<blockquote>
+<p><strong>为什么要共享EventLoop?</strong></p>
+<p><em>当你共享一个 EventLoop ，你保证共享EventLoop的所有 Channel 分配给 EventLoop 将使用相同的线程,消除上下文切换和相关的开销。(请记住,一个EventLoop分配给一个线程执行操作。)</em></p>
+</blockquote>
+<p><a href="http://opmjieyki.bkt.clouddn.com/17-10-4/59013059.jpg" target="_blank" rel="external"><img src="http://opmjieyki.bkt.clouddn.com/17-10-4/59013059.jpg" alt="img"></a></p>
+<ol>
+<li>当 bind() 调用时，ServerBootstrap 创建一个新的ServerChannel 。 当绑定成功后，这个管道就能接收子管道了。</li>
+<li>ServerChannel 接收新连接并且创建子管道来服务它们。</li>
+<li>Channel 用于接收到的连接</li>
+<li>管道自己创建了 Bootstrap，用于当 connect() 调用时创建一个新的管道</li>
+<li>新管道连接到远端。</li>
+<li>在 EventLoop 接收通过 connect() 创建后就在管道间共享。</li>
+</ol>
+<p>下面是实现 EventLoop 共享的例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line">ServerBootstrap bootstrap = <span class="keyword">new</span> ServerBootstrap(); <span class="comment">//1</span></div><div class="line">bootstrap.group(<span class="keyword">new</span> NioEventLoopGroup(), <span class="comment">//2</span></div><div class="line">    <span class="keyword">new</span> NioEventLoopGroup()).channel(NioServerSocketChannel.class) <span class="comment">//3</span></div><div class="line">        .childHandler(        <span class="comment">//4</span></div><div class="line">            <span class="keyword">new</span> SimpleChannelInboundHandler&lt;ByteBuf&gt;() &#123;</div><div class="line">            ChannelFuture connectFuture;</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelActive</span><span class="params">(ChannelHandlerContext ctx)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">                Bootstrap bootstrap = <span class="keyword">new</span> Bootstrap();<span class="comment">//5</span></div><div class="line">                bootstrap.channel(NioSocketChannel.class) <span class="comment">//6</span></div><div class="line">                        .handler(<span class="keyword">new</span> SimpleChannelInboundHandler&lt;ByteBuf&gt;() &#123;  <span class="comment">//7</span></div><div class="line">                            <span class="meta">@Override</span></div><div class="line">                            <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">channelRead0</span><span class="params">(ChannelHandlerContext ctx, ByteBuf in)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">                                System.out.println(<span class="string">"Reveived data"</span>);</div><div class="line">                            &#125;</div><div class="line">                        &#125;);</div><div class="line">                bootstrap.group(ctx.channel().eventLoop()); <span class="comment">//8</span></div><div class="line">                connectFuture = bootstrap.connect(<span class="keyword">new</span> InetSocketAddress(<span class="string">"localhost"</span>, <span class="number">80</span>));  <span class="comment">//9</span></div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">channelRead0</span><span class="params">(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">                <span class="keyword">if</span> (connectFuture.isDone()) &#123;</div><div class="line">                    <span class="comment">// do something with the data  //10</span></div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line">ChannelFuture future = bootstrap.bind(<span class="keyword">new</span> InetSocketAddress(<span class="number">8080</span>));  <span class="comment">//11</span></div><div class="line">future.addListener(<span class="keyword">new</span> ChannelFutureListener() &#123;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">operationComplete</span><span class="params">(ChannelFuture channelFuture)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">        <span class="keyword">if</span> (channelFuture.isSuccess()) &#123;</div><div class="line">            System.out.println(<span class="string">"Server bound"</span>);</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            System.err.println(<span class="string">"Bound attempt failed"</span>);</div><div class="line">            channelFuture.cause().printStackTrace();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<ol>
+<li>创建一个新的 ServerBootstrap 来创建新的 SocketChannel 管道并且绑定他们。</li>
+<li>指定 EventLoopGroups 从 ServerChannel 和接收到的管道来注册并获取。 EventLoops。</li>
+<li>指定 Channel 类来使用。</li>
+<li>设置处理器用于处理接收到的管道的 I/O 和数据。</li>
+<li>创建一个新的 Bootstrap 来连接到远程主机。</li>
+<li>设置管道类。</li>
+<li>设置处理器来处理 I/O。</li>
+<li>使用相同的 EventLoop 作为分配到接收的管道。</li>
+<li>连接到远端。</li>
+<li>连接完成处理业务逻辑 (比如, proxy)。</li>
+<li>通过配置了的 Bootstrap 来绑定到管道。</li>
+</ol>
+<p><strong>注意，新的 EventLoop 会创建一个新的 Thread。出于该原因，EventLoop 实例应该尽量重用。或者限制实例的数量来避免耗尽系统资源。</strong></p>
+<h3 id="五、从引导中添加ChannelHandler"><a href="#五、从引导中添加ChannelHandler" class="headerlink" title="五、从引导中添加ChannelHandler"></a>五、从引导中添加ChannelHandler</h3><p>在所有的例子代码中，我们在引导过程中通过 handler() 或childHandler() 都只添加了一个 ChannelHandler 实例，对于简单的程序可能足够，但是对于复杂的程序则无法满足需求。例如，某个程序必须支持多个协议，如 HTTP、WebSocket。若在一个 ChannelHandle r中处理这些协议将导致一个庞大而复杂的 ChannelHandler。Netty 通过添加多个 ChannelHandler，从而使每个 ChannelHandler 分工明确，结构清晰。</p>
+<p>Netty 的一个优势是可以在 ChannelPipeline 中堆叠很多ChannelHandler 并且可以最大程度的重用代码。如何添加多个ChannelHandler 呢？Netty 提供 ChannelInitializer 抽象类用来初始化 ChannelPipeline 中的 ChannelHandler。ChannelInitializer是一个特殊的 ChannelHandler，通道被注册到 EventLoop 后就会调用ChannelInitializer，并允许将 ChannelHandler 添加到CHannelPipeline；完成初始化通道后，这个特殊的 ChannelHandler 初始化器会从 ChannelPipeline 中自动删除。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">ServerBootstrap bootstrap = <span class="keyword">new</span> ServerBootstrap();<span class="comment">//1</span></div><div class="line">bootstrap.group(<span class="keyword">new</span> NioEventLoopGroup(), <span class="keyword">new</span> NioEventLoopGroup())  <span class="comment">//2</span></div><div class="line">    .channel(NioServerSocketChannel.class)  <span class="comment">//3</span></div><div class="line">    .childHandler(<span class="keyword">new</span> ChannelInitializerImpl()); <span class="comment">//4</span></div><div class="line">ChannelFuture future = bootstrap.bind(<span class="keyword">new</span> InetSocketAddress(<span class="number">8080</span>));  <span class="comment">//5</span></div><div class="line">future.sync();</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ChannelInitializerImpl</span> <span class="keyword">extends</span> <span class="title">ChannelInitializer</span>&lt;<span class="title">Channel</span>&gt; </span>&#123;  <span class="comment">//6</span></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initChannel</span><span class="params">(Channel ch)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">        ChannelPipeline pipeline = ch.pipeline(); <span class="comment">//7</span></div><div class="line">        pipeline.addLast(<span class="keyword">new</span> HttpClientCodec());</div><div class="line">        pipeline.addLast(<span class="keyword">new</span> HttpObjectAggregator(Integer.MAX_VALUE));</div><div class="line"></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ol>
+<li>创建一个新的 ServerBootstrap 来创建和绑定新的 Channel。</li>
+<li>指定 EventLoopGroups 从 ServerChannel 和接收到的管道来注册并获取 EventLoops。</li>
+<li>指定 Channel 类来使用。</li>
+<li>设置处理器用于处理接收到的管道的 I/O 和数据。</li>
+<li>通过配置的引导来绑定管道。</li>
+<li>ChannelInitializer 负责设置 ChannelPipeline。</li>
+<li>实现 initChannel() 来添加需要的处理器到 ChannelPipeline。一旦完成了这方法 ChannelInitializer 将会从 ChannelPipeline 删除自身。</li>
+</ol>
+<h3 id="六、ChannelOption和属性"><a href="#六、ChannelOption和属性" class="headerlink" title="六、ChannelOption和属性"></a>六、ChannelOption和属性</h3><p>Netty 提供了 ChannelOption 来帮助引导配置。这些选项会自动应用到引导创建的所有通道，可用的各种选项可以配置底层连接的详细信息，如通道“keep-alive(保持活跃)”或“timeout(超时)”的特性。</p>
+<p>Netty应用程序通常会与其他软件进行集成，在某些情况下，Netty的组件如Channel在Netty的正常生命周期外使用；Netty提供了抽象AttributeMap集合（一个由Channel和引导类提供的集合）以及AttributeKey（一个插入和获取属性值的泛型类）。使用这些工具，我们就可以安全的将任何类型的数据项与客户端和服务器Channel（包括ServerChannel的子Channel）相关联了。</p>
+<p>例如，考虑一个服务器应用程序跟踪用户和Channel之间的关系。这可以通过存储用户ID作为Channel的一个属性。类似的技术可以用来路由消息到基于用户ID或关闭基于用户活动的一个Channel。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">final</span> AttributeKey&lt;Integer&gt; id = <span class="keyword">new</span> AttributeKey&lt;Integer&gt;(<span class="string">"ID"</span>);　<span class="comment">//1</span></div><div class="line"></div><div class="line">Bootstrap bootstrap = <span class="keyword">new</span> Bootstrap(); <span class="comment">//2</span></div><div class="line">bootstrap.group(<span class="keyword">new</span> NioEventLoopGroup()) <span class="comment">//3</span></div><div class="line">        .channel(NioSocketChannel.class) <span class="comment">//4</span></div><div class="line">        .handler(<span class="keyword">new</span> SimpleChannelInboundHandler&lt;ByteBuf&gt;() &#123; <span class="comment">//5</span></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelRegistered</span><span class="params">(ChannelHandlerContext ctx)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">               Integer idValue = ctx.channel().attr(id).get();  <span class="comment">//6</span></div><div class="line">                <span class="comment">// do something  with the idValue</span></div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">channelRead0</span><span class="params">(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">                System.out.println(<span class="string">"Reveived data"</span>);</div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line">bootstrap.option(ChannelOption.SO_KEEPALIVE, <span class="keyword">true</span>).option(ChannelOption.CONNECT_TIMEOUT_MILLIS, <span class="number">5000</span>);   <span class="comment">//7</span></div><div class="line">bootstrap.attr(id, <span class="number">123456</span>); <span class="comment">//8</span></div><div class="line"></div><div class="line">ChannelFuture future = bootstrap.connect(<span class="keyword">new</span> InetSocketAddress(<span class="string">"localhost"</span>, <span class="number">80</span>));   <span class="comment">//9</span></div><div class="line">future.syncUninterruptibly();</div></pre></td></tr></table></figure>
+<ol>
+<li>新建一个 AttributeKey 用来存储属性值。</li>
+<li>新建 Bootstrap 用来创建客户端管道并连接他们。</li>
+<li>指定 EventLoopGroups 从和接收到的管道来注册并获取 EventLoop。</li>
+<li>指定 Channel 类。</li>
+<li>设置处理器来处理管道的 I/O 和数据。</li>
+<li>检索 AttributeKey 的属性及其值。</li>
+<li>设置 ChannelOption 将会设置在管道在连接或者绑定。</li>
+<li>存储 id 属性。</li>
+<li>通过配置的 Bootstrap 来连接到远程主机。</li>
+</ol>
+<h3 id="七、关闭应用程序"><a href="#七、关闭应用程序" class="headerlink" title="七、关闭应用程序"></a>七、关闭应用程序</h3><p>引导使你的应用程序启动并运行起来，但是迟早你都需要优雅的将它关闭。</p>
+<p>最重要的是，你需要关闭EventLoopGroup，它将处理任何挂起的事件和任务，并在随后释放所有活动的线程。</p>
+<p>这就是调用EventLoopGroup.shutdownGracefully()方法的作用，该方法调用将返回一个Future，这个Future将在关闭完成时得到通知。</p>
+<p>需要注意的是，shutdownGracefully()方法也是一个异步的操作，所以你需要阻塞等待知道它完成，或者向所返回的Future注册一个监听器以在关闭完成时得到通知。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">EventLoopGroup group = <span class="keyword">new</span> NioEventLoopGroup() <span class="comment">//1</span></div><div class="line">Bootstrap bootstrap = <span class="keyword">new</span> Bootstrap(); <span class="comment">//2</span></div><div class="line">bootstrap.group(group)</div><div class="line">    .channel(NioSocketChannel.class);</div><div class="line">...</div><div class="line">...</div><div class="line">Future&lt;?&gt; future = group.shutdownGracefully(); <span class="comment">//3</span></div><div class="line"><span class="comment">// block until the group has shutdown</span></div><div class="line">future.sync();</div></pre></td></tr></table></figure>
+<ol>
+<li>创建 EventLoopGroup 用于处理 I/O。</li>
+<li>创建一个新的 Bootstrap 并且配置它。</li>
+<li>最终优雅的关闭 EventLoopGroup 释放资源。这个也会关闭中当前使用的 Channel。</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/NIO/" rel="tag"># NIO</a>
+          
+            <a href="/tags/Netty/" rel="tag"># Netty</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/02/Netty-我很有freestyle（九）/" rel="next" title="Netty:我很有freestyle（九）">
+                <i class="fa fa-chevron-left"></i> Netty:我很有freestyle（九）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            <!--文章目录-->
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            <!--站点概览-->
+            站点概况
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          
+            <img class="site-author-image" itemprop="image"
+              src="/images/touxiang.jpg"
+              alt="林寒弋" style="height: 130px; max-width: 130px" />
+          
+            <p class="site-author-name" itemprop="name">林寒弋</p>
+            <p class="site-description motion-element" itemprop="description">天下事有难易乎？为之，则难者亦易矣；不为，则易者亦难矣。</p>
+        </div>
+
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives">
+            
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name"><!--日志-->文章</span>
+              </a>
+            </div>
+          
+
+          
+              <div class="site-state-item site-state-categories">
+                  <a href="/categories">
+                      <span class="site-state-item-count">3</span>
+                      <span class="site-state-item-name"><!-- 分类 -->分类</span>
+                  </a>
+              </div>
+          
+          
+              <div class="site-state-item site-state-tags">
+                  <a href="/tags">
+                      <span class="site-state-item-count">23</span>
+                      <span class="site-state-item-name"><!-- 标签 -->标签</span>
+                  </a>
+              </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LINhunger" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>GitHub</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.vcoder.top" title="直播demo" target="_blank">直播demo</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、Bootstarp类型"><span class="nav-number">1.</span> <span class="nav-text">一、Bootstarp类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、引导客户端和无连接协议"><span class="nav-number">2.</span> <span class="nav-text">二、引导客户端和无连接协议</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#（一）客户端引导方法"><span class="nav-number">2.1.</span> <span class="nav-text">（一）客户端引导方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（二）如何引导客户端"><span class="nav-number">2.2.</span> <span class="nav-text">（二）如何引导客户端</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、引导服务器"><span class="nav-number">3.</span> <span class="nav-text">三、引导服务器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#（一）引导服务器的方法"><span class="nav-number">3.1.</span> <span class="nav-text">（一）引导服务器的方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四、从Channel引导客户端"><span class="nav-number">4.</span> <span class="nav-text">四、从Channel引导客户端</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#五、从引导中添加ChannelHandler"><span class="nav-number">5.</span> <span class="nav-text">五、从引导中添加ChannelHandler</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#六、ChannelOption和属性"><span class="nav-number">6.</span> <span class="nav-text">六、ChannelOption和属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#七、关闭应用程序"><span class="nav-number">7.</span> <span class="nav-text">七、关闭应用程序</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">林寒弋</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.2</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.2"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,JVM,内存管理,深入理解Java虚拟机," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="Java虚拟机在执行Java程序的过程会把它所管理的内存划分成若干个不同的数据区域。每个区域都有各自的生命周期、创建以及销毁的事件。下面将对这些区域进行介绍。">
+<meta name="keywords" content="Java,JVM,内存管理,深入理解Java虚拟机">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM送分题：内存区域（一）">
+<meta property="og:url" content="https://LINhunger.github.io/2017/10/06/JVM送分题：内存区域（一）/index.html">
+<meta property="og:site_name" content="小排骨和他的小霸王学习机">
+<meta property="og:description" content="Java虚拟机在执行Java程序的过程会把它所管理的内存划分成若干个不同的数据区域。每个区域都有各自的生命周期、创建以及销毁的事件。下面将对这些区域进行介绍。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-10-6/47339074.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-10-6/26482164.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-10-6/84053511.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-10-6/81180851.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-10-6/88354602.jpg">
+<meta property="og:updated_time" content="2017-10-06T16:29:50.193Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JVM送分题：内存区域（一）">
+<meta name="twitter:description" content="Java虚拟机在执行Java程序的过程会把它所管理的内存划分成若干个不同的数据区域。每个区域都有各自的生命周期、创建以及销毁的事件。下面将对这些区域进行介绍。">
+<meta name="twitter:image" content="http://opmjieyki.bkt.clouddn.com/17-10-6/47339074.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '2HS2W2NK4P',
+      apiKey: '161bd5753774a3f862efb9e010c5a870',
+      indexName: 'hunger_blog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://LINhunger.github.io/2017/10/06/JVM送分题：内存区域（一）/"/>
+
+
+
+
+
+  <title>JVM送分题：内存区域（一） | 小排骨和他的小霸王学习机</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小排骨和他的小霸王学习机</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">千万不要懒惰久了，努力一下就以为是在拼命。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-主页">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            主页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-归档">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-分类">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://LINhunger.github.io/2017/10/06/JVM送分题：内存区域（一）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="林寒弋">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/touxiang1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小排骨和他的小霸王学习机">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline" style="font-size:45px">JVM送分题：内存区域（一）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-06T17:25:37+08:00">
+                2017-10-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM虚拟机/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM虚拟机</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Java虚拟机在执行Java程序的过程会把它所管理的内存划分成若干个不同的数据区域。每个区域都有各自的生命周期、创建以及销毁的事件。下面将对这些区域进行介绍。</p>
+<a id="more"></a>
+<p>根据《Java虚拟机规范》的规定Java虚拟机所管理的内存将会包括以下几个运行时区域。如下图所示：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-10-6/47339074.jpg" alt=""></p>
+<h3 id="一、程序计数器"><a href="#一、程序计数器" class="headerlink" title="一、程序计数器"></a>一、程序计数器</h3><p>程序计数器（Program Counter Register）是一块较小的内存空间，它可以看做是当前线程所执行的字节码的行号指示器。在JVM概念模型中，字节码解释器工作时就是通过改变这个计数器的值来选取下一条需要执行的字节码指令。</p>
+<p>由于JVM的多线程是通过线程轮流切换并分配处理器执行时间的方式来实现的，为了在线程切换后能恢复到正确的位置，每条线程都需要有独立的程序计数器。<strong>程序计数器是线程私有的内存区域。</strong></p>
+<p>如果线程执行的是一个Java方法，计数器记录的是正在执行的虚拟机字节码指令的地址。</p>
+<p>如果线程执行的一个native方法，计数器的值为空。</p>
+<p>程序计数器区域是Java虚拟机规范中唯一一个没有规定任何OutOfMemoryError情况的区域。</p>
+<h3 id="二、Java虚拟机栈"><a href="#二、Java虚拟机栈" class="headerlink" title="二、Java虚拟机栈"></a>二、Java虚拟机栈</h3><p>Java虚拟机栈描述的是Java方法执行的内存模型：每个方法执行的同时会创建一个<strong>栈帧</strong>，栈帧用于存储局部变量表、操作数栈、动态链接、方法出口等信息。每个方法从调用直到执行完成的过程，就对应着一个栈帧在虚拟机栈中入栈到出栈的过程。</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-10-6/26482164.jpg" alt=""></p>
+<p>java虚拟机栈是线程私有的，它的生命周期与线程相同。</p>
+<p>程序员主要关注的<strong>stack栈内存</strong>，就是虚拟机栈中局部变量表部分。</p>
+<p>局部变量表存放了编译时期可知的各种基本数据类型和对象引用。局部变量表所需的内存空间在编译时期完成分配，当进入一个方法时，这个方法需要在栈帧中分配多大的局部变量空间时完全确定的，<strong>在方法运行期间不会改变局部变量的大小。</strong></p>
+<p>Java虚拟机规范对这个区域规定了两种异常情况：</p>
+<ol>
+<li>如果线程请求的栈深度大于虚拟机所允许的深度，将抛出<code>StackOverflowError</code> 异常；</li>
+<li>如果虚拟机栈可以动态扩展，如果扩展时无法申请到足够的内存时，就会抛出<code>OutOfMemoryError</code>异常。</li>
+</ol>
+<h3 id="三、本地方法栈"><a href="#三、本地方法栈" class="headerlink" title="三、本地方法栈"></a>三、本地方法栈</h3><p>本地方法栈与虚拟机栈所发挥的作用是非常相似的，它们之间的区别不过是虚拟机栈为虚拟机执行Java方法服务（也就是字节码），而本地方法栈为虚拟机使用到的native方法服务。</p>
+<p>Java虚拟机规范对本地方法栈使用的语言、使用方法与数据结构并没有强制规定，因此可以由虚拟机自由实现。</p>
+<p>同虚拟机栈相同，Java虚拟机规范对这个区域也规定了两种异常情况<code>StackOverflowError</code> 和 <code>OutOfMemoryError</code>异常。</p>
+<h3 id="四、Java堆"><a href="#四、Java堆" class="headerlink" title="四、Java堆"></a>四、Java堆</h3><p>Java堆是被所有的线程共享的一块区域，在虚拟机启动时创建。Java堆的唯一目的就是存放对象实例，<strong>几乎所有的对象实例</strong>都在这里分配内存。</p>
+<p>Java堆是垃圾回收器管理的主要区域，因此也被称为“GC堆”。</p>
+<p>从内存回收的角度看，由于现在的收集器都采用分代收集算法，所以Java堆可以细分为：新生代、老年代。从内存分配的角度看，线程共享的Java堆可能划分出多个线程私有的分配缓冲区（TLAB）。无论如何划分，都与存放的内容无关，无论哪个区域，存储的仍然是对象实例。</p>
+<p>Java虚拟机规范规定，Java堆可以处在<strong>物理上不连续</strong>的内存空间中，只要是逻辑上是连续的即可，就像是我们的磁盘空间一样。在实现上，既可以是固定大小的，也可以是可扩展的，不过现在的JVM一般都是可扩展的。</p>
+<p>Java虚拟机规范规定，如果在堆上没有内存完成实例分配，并且堆上也无法再扩展时，将会抛出<code>OutOfMemoryError</code>异常。</p>
+<p><strong>内存泄漏与内存溢出：</strong></p>
+<ul>
+<li>内存泄漏：指程序中一些对象不会被GC所回收，它始终占用内存，即被分配的对象引用链可达但已无用。</li>
+<li>内存溢出：程序运行过程中<strong>无法申请足够的内存</strong>而导致的一种错误。内存溢出通常发生于OLD段（老年代）或Perm段（永久代）垃圾回收后，仍然无内存空间容纳新的Java对象的情况。</li>
+</ul>
+<h3 id="五、方法区"><a href="#五、方法区" class="headerlink" title="五、方法区"></a>五、方法区</h3><p>方法区也是被所有的线程共享的一块内存区域。它<strong>用于存储已被虚拟机加载的类信息，常量、静态变量、即时编译器编译后的代码等数据</strong>。</p>
+<p>Java虚拟机规范对方法区的限制非常宽松，除了和Java堆一样不需要连续的内存和可以选择固定大小或者可扩张之外，还可以选择不实现垃圾回收。</p>
+<p>这区域的内存回收目标主要是针对常量池的回收和类型的卸载，一般而言，这个区域的内存回收比较难以令人满意，尤其是类型的回收，条件相当苛刻，但是这部分区域的内存回收确实是有必要的。</p>
+<p>Java虚拟机规范规定，当方法区无法满足内存分配的需求时，将抛出<code>OutOfMemoryError</code>异常。</p>
+<h4 id="（一）运行时常量池："><a href="#（一）运行时常量池：" class="headerlink" title="（一）运行时常量池："></a>（一）运行时常量池：</h4><p>运行时常量池是方法区的一部分。</p>
+<p>CLass文件中除了有类的版本、字段、方法、接口等描述信息外，还有一项信息是常量池，用于存放编译期生成的各种字面量和符号引用，这部分内容将在类加载后进入方法区的运行时常量池中存放。</p>
+<p>运行时常量池相对于Class文件常量池的另外一个重要特征是具备动态性，Java语言并不要求常量一个只有编译器才能产生，也就是并非预置入Class文件中的常量池内容才能进入方法区的运行时常量池，<strong>运行期间也可以将新的常量放入池中</strong>，这种特性被开发人员利用比较多的就是String类的<code>intern()</code>方法。</p>
+<blockquote>
+<p><strong>Class文件中的常量池：</strong></p>
+<p>在Class文件结构中，最头的4个字节用于存储魔数Magic Number，用于确定一个文件是否能被JVM接受，再接着4个字节用于存储版本号，前2个字节存储次版本号，后2个存储主版本号，再接着是用于存放常量的常量池，由于常量的数量是不固定的，所以常量池的入口放置一个U2类型的数据(constant_pool_count)存储常量池容量计数值。</p>
+<p>常量池主要用于存放两大类常量：<strong>字面量</strong>(Literal)和<strong>符号引用量</strong>(Symbolic References)，字面量相当于Java语言层面常量的概念，如文本字符串，声明为final的常量值等，符号引用则属于编译原理方面的概念，包括了如下三种类型的常量：</p>
+<ul>
+<li>类和接口的全限定名</li>
+<li>字段名称和描述符</li>
+<li>方法名称和描述符</li>
+</ul>
+</blockquote>
+<h4 id="（二）String-intern"><a href="#（二）String-intern" class="headerlink" title="（二）String.intern()"></a>（二）String.intern()</h4><p><code>String.intern()</code>是一个native()方法，它的作用是：如果字符串常量池中已经包含了一个等于此String对象的字符串，则返回代表池中这个字符串的String对象；否则，将此String对象包含的字符串添加到常量池中，并返回此字符串的引用。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">    String s = <span class="keyword">new</span> String(<span class="string">"1"</span>);</div><div class="line">    s.intern();</div><div class="line">    String s2 = <span class="string">"1"</span>;</div><div class="line">    System.out.println(s == s2);</div><div class="line"></div><div class="line">    String s3 = <span class="keyword">new</span> String(<span class="string">"1"</span>) + <span class="keyword">new</span> String(<span class="string">"1"</span>);</div><div class="line">    s3.intern();</div><div class="line">    String s4 = <span class="string">"11"</span>;</div><div class="line">    System.out.println(s3 == s4);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这段代码在JDK1.6中运行会得到两个false，而在JDK1.7中运行，会得到一个true和一个false。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">    String s = <span class="keyword">new</span> String(<span class="string">"1"</span>);</div><div class="line">    String s2 = <span class="string">"1"</span>;</div><div class="line">    s.intern();</div><div class="line">    System.out.println(s == s2);</div><div class="line"></div><div class="line">    String s3 = <span class="keyword">new</span> String(<span class="string">"1"</span>) + <span class="keyword">new</span> String(<span class="string">"1"</span>);</div><div class="line">    String s4 = <span class="string">"11"</span>;</div><div class="line">    s3.intern();</div><div class="line">    System.out.println(s3 == s4);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这段代码在JDK1.6中运行会得到两个false，而在JDK1.7中运行，会得到两个false。</p>
+<h5 id="1-JDK1-6下的解释："><a href="#1-JDK1-6下的解释：" class="headerlink" title="1. JDK1.6下的解释："></a>1. JDK1.6下的解释：</h5><p><img src="http://opmjieyki.bkt.clouddn.com/17-10-6/84053511.jpg" alt=""></p>
+<p>如上图所示。首先说一下 jdk6中的情况，在 jdk6中上述的所有打印都是 false 的，因为 jdk6中的常量池是放在 Perm 区中的，Perm 区和正常的 JAVA Heap 区域是完全分开的。上面说过如果是使用引号声明的字符串都是会直接在字符串常量池中生成，而 new 出来的 String 对象是放在 JAVA Heap 区域。所以拿一个 JAVA Heap 区域的对象地址和字符串常量池的对象地址进行比较肯定是不相同的，即使调用<code>String.intern</code>方法也是没有任何关系的。</p>
+<h5 id="2-JDK1-7下的解释："><a href="#2-JDK1-7下的解释：" class="headerlink" title="2. JDK1.7下的解释："></a>2. JDK1.7下的解释：</h5><p>再说说 jdk7 中的情况。这里要明确一点的是，在 Jdk6 以及以前的版本中，字符串的常量池是放在堆的 Perm 区的，Perm 区是一个类静态的区域，主要存储一些加载类的信息，常量池，方法片段等内容，默认大小只有4m，一旦常量池中大量使用 intern 是会直接产生<code>java.lang.OutOfMemoryError: PermGen space</code>错误的。 所以在 jdk7 的版本中，字符串常量池已经从 Perm 区移到正常的 Java Heap 区域了。为什么要移动，Perm 区域太小是一个主要原因，当然据消息称 jdk8 已经直接取消了 Perm 区域，而新建立了一个元区域。应该是 jdk 开发者认为 Perm 区域已经不适合现在 JAVA 的发展了。</p>
+<p>第一段代码：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-10-6/81180851.jpg" alt=""></p>
+<ul>
+<li>在第一段代码中，先看 s3和s4字符串。<code>String s3 = new String(&quot;1&quot;) + new String(&quot;1&quot;);</code>，这句代码中现在生成了2最终个对象，是字符串常量池中的“1” 和 JAVA Heap 中的 s3引用指向的对象。中间还有2个匿名的<code>new String(&quot;1&quot;)</code>我们不去讨论它们。此时s3引用对象内容是”11”，但此时常量池中是没有 “11”对象的。</li>
+<li>接下来<code>s3.intern();</code>这一句代码，是将 s3中的“11”字符串放入 String 常量池中，因为此时常量池中不存在“11”字符串，因此常规做法是跟 jdk6 图中表示的那样，在常量池中生成一个 “11” 的对象，<strong>关键点是 jdk7 中常量池不在 Perm 区域了，这块做了调整。常量池中不需要再存储一份对象了，可以直接存储堆中的引用。这份引用指向 s3 引用的对象。 也就是说引用地址是相同的。</strong></li>
+<li>最后<code>String s4 = &quot;11&quot;;</code> 这句代码中”11”是显示声明的，因此会直接去常量池中创建，创建的时候发现已经有这个对象了，此时也就是指向 s3 引用对象的一个引用。所以 s4 引用就指向和 s3 一样了。因此最后的比较 <code>s3 == s4</code> 是 true。</li>
+<li>再看 s 和 s2 对象。 <code>String s = new String(&quot;1&quot;);</code> 第一句代码，生成了2个对象。常量池中的“1” 和 JAVA Heap 中的字符串对象。<code>s.intern();</code> 这一句是 s 对象去常量池中寻找后发现 “1” 已经在常量池里了。</li>
+<li>接下来<code>String s2 = &quot;1&quot;;</code> 这句代码是生成一个 s2的引用指向常量池中的“1”对象。 结果就是 s 和 s2 的引用地址明显不同。图中画的很清晰。</li>
+</ul>
+<p>第二段代码：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-10-6/88354602.jpg" alt=""></p>
+<ul>
+<li>来看第二段代码，从上边第二幅图中观察。第一段代码和第二段代码的改变就是 <code>s3.intern();</code> 的顺序是放在<code>String s4 = &quot;11&quot;;</code>后了。这样，首先执行<code>String s4 = &quot;11&quot;;</code>声明 s4 的时候常量池中是不存在“11”对象的，执行完毕后，“11“对象是 s4 声明产生的新对象。然后再执行<code>s3.intern();</code>时，常量池中“11”对象已经存在了，因此 s3 和 s4 的引用是不同的。</li>
+<li>第二段代码中的 s 和 s2 代码中，<code>s.intern();</code>，这一句往后放也不会有什么影响了，因为对象池中在执行第一句代码<code>String s = new String(&quot;1&quot;);</code>的时候已经生成“1”对象了。下边的s2声明都是直接从常量池中取地址引用的。 s 和 s2 的引用地址是不会相等的。</li>
+</ul>
+<h5 id="3-小结："><a href="#3-小结：" class="headerlink" title="3. 小结："></a>3. 小结：</h5><p>从上述的例子代码可以看出 jdk7 版本对 intern 操作和常量池都做了一定的修改。主要包括2点：</p>
+<ul>
+<li>将String常量池 从 Perm 区移动到了 Java Heap区</li>
+<li><code>String#intern</code> 方法时，如果存在堆中的对象，会直接保存对象的引用，而不会重新创建对象。</li>
+</ul>
+<h4 id="（三）基本数据类型的包装类与常量池"><a href="#（三）基本数据类型的包装类与常量池" class="headerlink" title="（三）基本数据类型的包装类与常量池"></a>（三）基本数据类型的包装类与常量池</h4><p>java中基本类型的包装类的大部分都实现了常量池技术，即Byte,Short,Integer,Long,Character,Boolean。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Integer i1 = <span class="number">40</span>;</div><div class="line">Integer i2 = <span class="number">40</span>;</div><div class="line">System.out.println(i1==i2);<span class="comment">//输出TRUE</span></div></pre></td></tr></table></figure>
+<p>这5种包装类默认创建了数值[-128，127]的相应类型的缓存数据，但是超出此范围仍然会去创建新的对象。</p>
+<blockquote>
+<p><strong>两种浮点数类型的包装类Float,Double并没有实现常量池技术。</strong></p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/JVM/" rel="tag"># JVM</a>
+          
+            <a href="/tags/内存管理/" rel="tag"># 内存管理</a>
+          
+            <a href="/tags/深入理解Java虚拟机/" rel="tag"># 深入理解Java虚拟机</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/06/如何正确地写出单例模式/" rel="next" title="如何正确地写出单例模式">
+                <i class="fa fa-chevron-left"></i> 如何正确地写出单例模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            <!--文章目录-->
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            <!--站点概览-->
+            站点概况
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          
+            <img class="site-author-image" itemprop="image"
+              src="/images/touxiang1.jpg"
+              alt="林寒弋" style="height: 130px; max-width: 130px" />
+          
+            <p class="site-author-name" itemprop="name">林寒弋</p>
+            <p class="site-description motion-element" itemprop="description">千万不要懒惰久了，努力一下就以为是在拼命。</p>
+        </div>
+
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives">
+            
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name"><!--日志-->文章</span>
+              </a>
+            </div>
+          
+
+          
+              <div class="site-state-item site-state-categories">
+                  <a href="/categories">
+                      <span class="site-state-item-count">5</span>
+                      <span class="site-state-item-name"><!-- 分类 -->分类</span>
+                  </a>
+              </div>
+          
+          
+              <div class="site-state-item site-state-tags">
+                  <a href="/tags">
+                      <span class="site-state-item-count">26</span>
+                      <span class="site-state-item-name"><!-- 标签 -->标签</span>
+                  </a>
+              </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LINhunger" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>GitHub</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.vcoder.top" title="直播demo" target="_blank">直播demo</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、程序计数器"><span class="nav-number">1.</span> <span class="nav-text">一、程序计数器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、Java虚拟机栈"><span class="nav-number">2.</span> <span class="nav-text">二、Java虚拟机栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、本地方法栈"><span class="nav-number">3.</span> <span class="nav-text">三、本地方法栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四、Java堆"><span class="nav-number">4.</span> <span class="nav-text">四、Java堆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#五、方法区"><span class="nav-number">5.</span> <span class="nav-text">五、方法区</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#（一）运行时常量池："><span class="nav-number">5.1.</span> <span class="nav-text">（一）运行时常量池：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（二）String-intern"><span class="nav-number">5.2.</span> <span class="nav-text">（二）String.intern()</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-JDK1-6下的解释："><span class="nav-number">5.2.1.</span> <span class="nav-text">1. JDK1.6下的解释：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-JDK1-7下的解释："><span class="nav-number">5.2.2.</span> <span class="nav-text">2. JDK1.7下的解释：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-小结："><span class="nav-number">5.2.3.</span> <span class="nav-text">3. 小结：</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（三）基本数据类型的包装类与常量池"><span class="nav-number">5.3.</span> <span class="nav-text">（三）基本数据类型的包装类与常量池</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">林寒弋</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.2</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.2"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

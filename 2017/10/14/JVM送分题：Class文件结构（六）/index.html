@@ -69,16 +69,17 @@
 
 
 
-<meta name="description" content="写完？写完是不可能的，这辈子都不可能写完的。编程我又不会，只有每天摸鱼，才维持了现在开心的样纸。">
-<meta property="og:type" content="website">
+<meta name="description" content="最后，将14种常量项的结构定义总结为下表：    常量 项目 类型 描述     CONSTANT_Utf8_info tag u1 值为1    length u2 UF-8编码的字符串占用的字节数    bytes u1 长度为length的UTF-8编码的字符串   CONSTANT_Integer_info tag u1 值为3    bytes u4 按照高位在前存储的int值   CO">
+<meta property="og:type" content="article">
 <meta property="og:title" content="小排骨和他的小霸王学习机">
-<meta property="og:url" content="https://LINhunger.github.io/archives/2017/page/2/index.html">
+<meta property="og:url" content="https://LINhunger.github.io/2017/10/14/JVM送分题：Class文件结构（六）/index.html">
 <meta property="og:site_name" content="小排骨和他的小霸王学习机">
-<meta property="og:description" content="写完？写完是不可能的，这辈子都不可能写完的。编程我又不会，只有每天摸鱼，才维持了现在开心的样纸。">
+<meta property="og:description" content="最后，将14种常量项的结构定义总结为下表：    常量 项目 类型 描述     CONSTANT_Utf8_info tag u1 值为1    length u2 UF-8编码的字符串占用的字节数    bytes u1 长度为length的UTF-8编码的字符串   CONSTANT_Integer_info tag u1 值为3    bytes u4 按照高位在前存储的int值   CO">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-10-14T15:35:02.447Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="小排骨和他的小霸王学习机">
-<meta name="twitter:description" content="写完？写完是不可能的，这辈子都不可能写完的。编程我又不会，只有每天摸鱼，才维持了现在开心的样纸。">
+<meta name="twitter:description" content="最后，将14种常量项的结构定义总结为下表：    常量 项目 类型 描述     CONSTANT_Utf8_info tag u1 值为1    length u2 UF-8编码的字符串占用的字节数    bytes u1 长度为length的UTF-8编码的字符串   CONSTANT_Integer_info tag u1 值为3    bytes u4 按照高位在前存储的int值   CO">
 
 
 
@@ -108,13 +109,13 @@
 
 
 
-  <link rel="canonical" href="https://LINhunger.github.io/archives/2017/page/2/"/>
+  <link rel="canonical" href="https://LINhunger.github.io/2017/10/14/JVM送分题：Class文件结构（六）/"/>
 
 
 
 
 
-  <title>归档 | 小排骨和他的小霸王学习机</title>
+  <title> | 小排骨和他的小霸王学习机</title>
   
 
 
@@ -133,7 +134,7 @@
     
   
 
-  <div class="container sidebar-position-left page-archive">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -255,410 +256,363 @@
           <div id="content" class="content">
             
 
+  <div id="posts" class="posts-expand">
+    
+
+  
+
   
   
   
-  <div class="post-block archive">
-    <div id="posts" class="posts-collapse">
-      <span class="archive-move-on"></span>
 
-      <span class="archive-page-counter">
-        
-        
-         
-        
-        OK! 目前共计 33 篇日志。 继续努力。
-      </span>
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://LINhunger.github.io/2017/10/14/JVM送分题：Class文件结构（六）/">
 
-      
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="林寒弋">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/touxiang1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小排骨和他的小霸王学习机">
+    </span>
+
+    
+      <header class="post-header">
 
         
         
+          <h1 class="post-title" itemprop="name headline" style="font-size:45px"></h1>
         
 
-        
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-14T23:35:02+08:00">
+                2017-10-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
           
-          <div class="collection-title">
-            <h1 class="archive-year" id="archive-year-2017">2017</h1>
-          </div>
-        
-        
 
-        
+          
+            
+          
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+          
+          
 
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/10/02/Netty-我很有freestyle（八）/" itemprop="url">
-              
-                <span itemprop="name">Netty:我很有freestyle（八）</span>
-              
-            </a>
-        
-      </h2>
+          
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-10-02T10:39:34+08:00"
-              content="2017-10-02" >
-          10-02
-        </time>
-      </div>
+          
 
-    </header>
-  </article>
+          
 
+        </div>
+      </header>
+    
 
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/10/02/Netty-我很有freestyle（七）/" itemprop="url">
-              
-                <span itemprop="name">Netty:我很有freestyle（七）</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-10-02T10:39:26+08:00"
-              content="2017-10-02" >
-          10-02
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
       
 
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/09/29/Netty-我很有freestyle（六）/" itemprop="url">
-              
-                <span itemprop="name">Netty:我很有freestyle（六）</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-09-29T19:31:43+08:00"
-              content="2017-09-29" >
-          09-29
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
+      
+        <p>最后，将14种常量项的结构定义总结为下表：</p>
+<table>
+<thead>
+<tr>
+<th>常量</th>
+<th style="text-align:center">项目</th>
+<th style="text-align:center">类型</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CONSTANT_Utf8_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为1</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">length</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">UF-8编码的字符串占用的字节数</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">bytes</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">长度为length的UTF-8编码的字符串</td>
+</tr>
+<tr>
+<td>CONSTANT_Integer_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为3</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">bytes</td>
+<td style="text-align:center">u4</td>
+<td style="text-align:left">按照高位在前存储的int值</td>
+</tr>
+<tr>
+<td>CONSTANT_Float_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为4</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">bytes</td>
+<td style="text-align:center">u4</td>
+<td style="text-align:left">按照高位在前存储的float值</td>
+</tr>
+<tr>
+<td>CONSTANT_Long_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为5</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">bytes</td>
+<td style="text-align:center">u8</td>
+<td style="text-align:left">按照高位在前存储的long值</td>
+</tr>
+<tr>
+<td>CONSTANT_Double_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为6</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">bytes</td>
+<td style="text-align:center">u8</td>
+<td style="text-align:left">按照高位在前存储的double值</td>
+</tr>
+<tr>
+<td>CONSTANT_Class_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为7</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">指向全限定名常量项的索引</td>
+</tr>
+<tr>
+<td>CONSTANT_String_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为8</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">指向字符串字面量的索引</td>
+</tr>
+<tr>
+<td>CONSTANT_Fieldref_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为9</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">指向声明字段的类或接口描述符CONSTANT_Class_info的索引项</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">指向字段名称及类型描述符CONSTANT_NameAndType_info的索引项</td>
+</tr>
+<tr>
+<td>CONSTANT_Methodref_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为10</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">指向声明方法的类描述符CONSTANT_Class_info的索引项</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">指向方法名称及类型描述符CONSTANT_NameAndType_info的索引项</td>
+</tr>
+<tr>
+<td>CONSTANT_InrerfaceMethodref_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为11</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">指向声明方法的接口描述符CONSTANT_Class_info的索引项</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">指向方法名称及类型描述符CONSTANT_NameAndType_info的索引项</td>
+</tr>
+<tr>
+<td>CONSTANT_NameAndType_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为12</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">指向字段或方法名称常量项目的索引</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">指向该字段或方法描述符常量项的索引</td>
+</tr>
+<tr>
+<td>CONSTANT_MethodHandle_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为15</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">reference_kind</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值必须是在1-9之间（包括1和9），它决定了方法句柄的类型。方法句柄类型的值表示方法句柄的字节码行为。</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">reference_index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">值必须是对常量池的有效索引</td>
+</tr>
+<tr>
+<td>CONSTANT_MethodType_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为16</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">descriptor_index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">值必须是对常量池的有效索引，常量池在该索引处的项必须是CONSTANT_Utf8_info结构，表示方法的描述符</td>
+</tr>
+<tr>
+<td>CONSTANT_InvokeDynamic_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为18</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">bootstrap_method_attr_index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">值必须是对当前Class文件中引导方法表的bootstrap_methods[]数组的有效索引</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">name_and_type_index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">值必须是对当前常量池的有效索引，常量池在该索引处的项必须是CONSTANT_NameAndType_info结构，表示方法名和方法描述符</td>
+</tr>
+</tbody>
+</table>
 
       
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/09/29/Netty-我很有freestyle（五）/" itemprop="url">
-              
-                <span itemprop="name">Netty:我很有freestyle（五）</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-09-29T19:31:35+08:00"
-              content="2017-09-29" >
-          09-29
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/09/29/Netty-我很有freestyle（四）/" itemprop="url">
-              
-                <span itemprop="name">Netty:我很有freestyle（四）</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-09-29T19:31:27+08:00"
-              content="2017-09-29" >
-          09-29
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/09/27/Netty-我很有freestyle（三）/" itemprop="url">
-              
-                <span itemprop="name">Netty:我很有freestyle（三）</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-09-27T15:54:43+08:00"
-              content="2017-09-27" >
-          09-27
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/09/27/Netty-我很有freestyle（二）/" itemprop="url">
-              
-                <span itemprop="name">Netty:我很有freestyle（二）</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-09-27T09:58:22+08:00"
-              content="2017-09-27" >
-          09-27
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/09/25/内核线程与用户线程/" itemprop="url">
-              
-                <span itemprop="name">内核线程与用户线程</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-09-25T20:39:10+08:00"
-              content="2017-09-25" >
-          09-25
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/09/25/进程与线程/" itemprop="url">
-              
-                <span itemprop="name">进程与线程</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-09-25T11:54:31+08:00"
-              content="2017-09-25" >
-          09-25
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/09/24/Netty-我很有freestyle（一）/" itemprop="url">
-              
-                <span itemprop="name">Netty:我很有freestyle（一）</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-09-24T22:00:46+08:00"
-              content="2017-09-24" >
-          09-24
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
     </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/10/JVM送分题：垃圾回收器（五）/" rel="next" title="JVM送分题：垃圾回收器（五）">
+                <i class="fa fa-chevron-left"></i> JVM送分题：垃圾回收器（五）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
-
-  
-  <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/archives/2017/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/archives/2017/">1</a><span class="page-number current">2</span><a class="page-number" href="/archives/2017/page/3/">3</a><a class="page-number" href="/archives/2017/page/4/">4</a><a class="extend next" rel="next" href="/archives/2017/page/3/"><i class="fa fa-angle-right"></i></a>
-  </nav>
+  </article>
 
 
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -666,6 +620,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
         </div>
         

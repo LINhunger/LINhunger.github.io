@@ -78,7 +78,12 @@
 <meta property="og:description" content="在Java中，通过Javac将Java程序编译成字节码Class文件，而Class文件可以被虚拟机JVM加载执行，从而实现了平台无关的特性，在本节，我们将介绍Class类文件的结构。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-10-14/91538459.jpg">
-<meta property="og:updated_time" content="2017-10-15T01:57:47.447Z">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-10-14/6026078.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-10-15/33253396.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-10-15/18534249.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-10-15/14164934.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-10-15/21758686.jpg">
+<meta property="og:updated_time" content="2017-10-15T10:59:11.177Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JVM送分题：Class文件结构（五）">
 <meta name="twitter:description" content="在Java中，通过Javac将Java程序编译成字节码Class文件，而Class文件可以被虚拟机JVM加载执行，从而实现了平台无关的特性，在本节，我们将介绍Class类文件的结构。">
@@ -631,6 +636,7 @@
 <li>普通UTF-8编码的所有字符都使用3个字节表示。</li>
 </ul>
 <p>本例中，这个字符串的为0x001D，也就是长度29字节，往后的29个字节正好都在1~127的ASCII码范围内，内容为“org/fenixsoft/clazz/TestClass”。</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-10-14/6026078.jpg" alt=""></p>
 <h4 id="（四）常量项的结构定义"><a href="#（四）常量项的结构定义" class="headerlink" title="（四）常量项的结构定义"></a>（四）常量项的结构定义</h4><p>最后，将14种常量项的结构定义总结为下表：</p>
 <table>
 <thead>
@@ -854,7 +860,382 @@
 </tr>
 </tbody>
 </table>
-
+<h3 id="五、访问标志"><a href="#五、访问标志" class="headerlink" title="五、访问标志"></a>五、访问标志</h3><p>在常量池访问结束后，紧接着的两个字节是访问标志（access_flags），这个标志用于识别一些类或者接口层次的访问信息，包括：这个Class是类还是接口；是否定义为public类型；是否定义为abstract类型；如果是类的话，是否被声明为final等。</p>
+<p>下面是具体的标志位以及标志的含义：</p>
+<table>
+<thead>
+<tr>
+<th>标志名</th>
+<th>标志值</th>
+<th>标志含义</th>
+<th>针对的对像</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ACC_PUBLIC</td>
+<td>0x0001</td>
+<td>public类型</td>
+<td>所有类型</td>
+</tr>
+<tr>
+<td>ACC_FINAL</td>
+<td>0x0010</td>
+<td>final类型</td>
+<td>类</td>
+</tr>
+<tr>
+<td>ACC_SUPER</td>
+<td>0x0020</td>
+<td>使用新的invokespecial语义</td>
+<td>类和接口</td>
+</tr>
+<tr>
+<td>ACC_INTERFACE</td>
+<td>0x0200</td>
+<td>接口类型</td>
+<td>接口</td>
+</tr>
+<tr>
+<td>ACC_ABSTRACT</td>
+<td>0x0400</td>
+<td>抽象类型</td>
+<td>类和接口</td>
+</tr>
+<tr>
+<td>ACC_SYNTHETIC</td>
+<td>0x1000</td>
+<td>该类不由用户代码生成</td>
+<td>所有类型</td>
+</tr>
+<tr>
+<td>ACC_ANNOTATION</td>
+<td>0x2000</td>
+<td>注解类型</td>
+<td>注解</td>
+</tr>
+<tr>
+<td>ACC_ENUM</td>
+<td>0x4000</td>
+<td>枚举类型</td>
+<td>枚举</td>
+</tr>
+</tbody>
+</table>
+<p>access_flags中一共定义了16个标志位可以使用，当前自定义了8个，没有使用到的标志位要求一律为0.</p>
+<p>以前面Class文件为例：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-10-15/33253396.jpg" alt=""></p>
+<p>TestClass是一个普通的Java类，不是接口、枚举或者注解，被public关键字修饰但没有被声明为final或abstract。</p>
+<p>因此，它的ACC_PUBLIC、ACC_SUPER应为真，而ACC_FINAL、ACC_INTERFACE、 ACC_ABSTRACT、ACC_SYNTHETIC、ACC_ANNOTATION、ACC_ENUM这六个标志位应为假，因此它的access_flags的值应为：0x0001|0x0020 = 0x0021。从表中看出的确是0x0021。</p>
+<h3 id="六、类索引、父类索引与接口索引集合"><a href="#六、类索引、父类索引与接口索引集合" class="headerlink" title="六、类索引、父类索引与接口索引集合"></a>六、类索引、父类索引与接口索引集合</h3><p>类索引（this_class）和父类索引（super_class）都是u2类型的数据，而接口索引集合（interfaces）是一组u2类型的数据的集合。Class文件中由这三项关系来确定这个类的继承关系。</p>
+<p>类索引用于确定这个类的全限定名，父类索引用于确定这个类的父类的全限定名。除了Object外，所有的Java类都有父类，因此除了Object类外，所有Java类的父类索引都不为0。接口集合用来描述这个类实现了那些接口，这些被实现的接口将按接口顺序从左到右排列在接口索引集合中。</p>
+<p>类索引、父类索引和接口索引集合都按顺序排列在访问标志之后，类索引和父类索引用两个u2类型的索引值表示，它们各自指向一个类型为CONSTANT_Class_info的类描述符常量，通过CONSTANT_Class_info类型的常量的索引值可以找到定义在CONSTANT_Utf8_info类型的常量中的全限定名字符串。</p>
+<p>下面看一下前面Class的类类索引查找过程：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-10-15/18534249.jpg" alt=""></p>
+<p>对于接口索引集合，入口的第一项——u2类型的数据为接口接口数据（interface_count）表示是索引表的容量。如果该类没有实现任何接口，则该计数器值为0，后面接口的索引表不再占用任何字节。</p>
+<p>下面是类索引、父类索引和接口表索引的内容：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-10-15/14164934.jpg" alt=""></p>
+<p>从偏移地址0x000000F1开始的3个u2类型的值分别是0x0001、0x0003、0x0000，也就是类索引为1（对应前面常量池的第一个常量），父类索引为3，接口索引集合大小为0。</p>
+<h3 id="七、字段表集合"><a href="#七、字段表集合" class="headerlink" title="七、字段表集合"></a>七、字段表集合</h3><p>字段表（field_info）用于描述接口或者类中声明的变量。字段（field）包括类级变量以及实例级变量，但不包括在方法内部声明的局部变量。</p>
+<p>一个字段包括的信息有：</p>
+<ul>
+<li>字段的作用域（public、private、protect）</li>
+<li>是实例变量还是类变量（static）</li>
+<li>可变性（final）</li>
+<li>并发可见性（volatile）</li>
+<li>可否被序列化（transient）</li>
+<li>字段数据类型（基本类型、对象、数组）</li>
+<li>字段名称</li>
+</ul>
+<p>上述的这些信息中，各个修饰符都是布尔值，很适合用标志位来表示。而字段叫什么名字、字段被定义为什么数据类型，这些都是无法固定的，只能引用常量池的常量来描述。</p>
+<p>下面列出了字段表的最终格式：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>名称</th>
+<th>数量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>u2</td>
+<td>access_flags</td>
+<td>1</td>
+</tr>
+<tr>
+<td>u2</td>
+<td>name_index</td>
+<td>1</td>
+</tr>
+<tr>
+<td>u2</td>
+<td>descriptor_index</td>
+<td>1</td>
+</tr>
+<tr>
+<td>u2</td>
+<td>attributes_count</td>
+<td>1</td>
+</tr>
+<tr>
+<td>attribute_info</td>
+<td>attributes</td>
+<td>attributes_count</td>
+</tr>
+</tbody>
+</table>
+<h5 id="1-access-flags"><a href="#1-access-flags" class="headerlink" title="1. access_flags"></a>1. access_flags</h5><p>字段修饰符放在access_flags项目中，它与类中的access_flag项目是非常类似的，都是一个u2的数据类型，其中可以设置的标志位和含义见下表：</p>
+<table>
+<thead>
+<tr>
+<th>标志名称</th>
+<th>标志值</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ACC_PUBLIC</td>
+<td>0x00 01</td>
+<td>字段是否为public</td>
+</tr>
+<tr>
+<td>ACC_PRIVATE</td>
+<td>0x00 02</td>
+<td>字段是否为private</td>
+</tr>
+<tr>
+<td>ACC_PROTECTED</td>
+<td>0x00 04</td>
+<td>字段是否为protected</td>
+</tr>
+<tr>
+<td>ACC_STATIC</td>
+<td>0x00 08</td>
+<td>字段是否为static</td>
+</tr>
+<tr>
+<td>ACC_FINAL</td>
+<td>0x00 10</td>
+<td>字段是否为final</td>
+</tr>
+<tr>
+<td>ACC_VOLATILE</td>
+<td>0x00 40</td>
+<td>字段是否为volatile</td>
+</tr>
+<tr>
+<td>ACC_TRANSTENT</td>
+<td>0x00 80</td>
+<td>字段是否为transient</td>
+</tr>
+<tr>
+<td>ACC_SYNCHETIC</td>
+<td>0x10 00</td>
+<td>字段是否为由编译器自动产生</td>
+</tr>
+<tr>
+<td>ACC_ENUM</td>
+<td>0x40 00</td>
+<td>字段是否为enum</td>
+</tr>
+</tbody>
+</table>
+<p>很明显，在实际情况中ACC_PUBLIC、ACC_PRIVATE、ACC_PROTECTED三个标志最多只能选其一，ACC_FINAL、ACC_VOLATILE不能同时选择。接口之中的字段必须有ACC_PUBLIC、ACC_STATIC、ACC_FINAL标志，这些都是由Java本身的语言规则决定的。</p>
+<h5 id="2-name-index和descriptor-index"><a href="#2-name-index和descriptor-index" class="headerlink" title="2. name_index和descriptor_index"></a>2. name_index和descriptor_index</h5><p>跟随在access_flags标志后面的是两项索引值：name_index和descriptor_index。它们都是对常量池的引用，分别代表着<strong>字段的简单名称</strong>以及<strong>字段和方法的描述符</strong>。</p>
+<p>下面来解释一下“简单名称”、“描述符”、“全限定名”这三种特殊字符串的概念。</p>
+<p>简单名称是指没有类型和参数的修饰的方法或字段名称，比如一个类中的inc()方法和m字段的简单名称是<code>&quot;inc&quot;</code>和<code>&quot;m&quot;</code>。</p>
+<p>全限定名，以前面的“org/fenixsoft/clazz/TestClass”是这个类的全限定名。为了使连续的多个全限定名之间不产生混淆，在使用时最后一般会加入一个“;”，表示全限定名结束。</p>
+<p>对于方法和字段的描述符。描述符的作用是用来描述字段的数据类型、方法的参数列表（包括数量、类型以及顺序）和返回值。</p>
+<p>当描述符描述字段时，基本数据类型以及void都用一个大写字符表示，而对象类型则用字符L加对象的全限定名来表示。详情见下表：</p>
+<table>
+<thead>
+<tr>
+<th>标志符</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B</td>
+<td>基本数据类型byte</td>
+</tr>
+<tr>
+<td>C</td>
+<td>基本数据类型char</td>
+</tr>
+<tr>
+<td>D</td>
+<td>基本数据类型double</td>
+</tr>
+<tr>
+<td>F</td>
+<td>基本数据类型float</td>
+</tr>
+<tr>
+<td>I</td>
+<td>基本数据类型int</td>
+</tr>
+<tr>
+<td>J</td>
+<td>基本数据类型long</td>
+</tr>
+<tr>
+<td>S</td>
+<td>基本数据类型short</td>
+</tr>
+<tr>
+<td>Z</td>
+<td>基本数据类型boolean</td>
+</tr>
+<tr>
+<td>V</td>
+<td>基本数据类型void</td>
+</tr>
+<tr>
+<td>L</td>
+<td>对象类型</td>
+</tr>
+</tbody>
+</table>
+<p>对于数组类型，每一维度将使用一个前置的“[”字符来描述，如一个定义为<code>java.lang.String[][]</code>类型的二维数组，将被记录为：<code>[[Ljava/lang/String;</code>，一个整型数组<code>int[]</code>将被记录为<code>[I</code>。</p>
+<p>用描述符描述字段时，按照先参数列表，后返回值的顺序描述。例如</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">indexOf</span><span class="params">(<span class="keyword">char</span>[] c1,<span class="keyword">int</span> i1,<span class="keyword">int</span> i2,<span class="keyword">char</span>[] c2,<span class="keyword">int</span> i3,<span class="keyword">int</span> i4,<span class="keyword">int</span> i5)</span></span>;</div></pre></td></tr></table></figure>
+<p>这个方法的描述符为：<code>([CII[CIII)I</code>。</p>
+<h5 id="3-attributes"><a href="#3-attributes" class="headerlink" title="3. attributes"></a>3. attributes</h5><p>在descriptor_index之后跟随着一个属性表集合用于存储额外的信息，字段都可以在属性表中描述0至多项的额外信息。</p>
+<p>例如：如果将的声明字段为“final static int = 123;”，那么久可能会存在一项名称为ConstantValue的属性，其值指向常量123。（后面会继续介绍）</p>
+<p>字段表集合中不会列出从超类或者父接口中继承而来的字段，但有可能列出原本Java代码之中不存在的字段，譬如在内部类中为了保持对外部类的访问性，会自动添加指向外部类实例的字段。</p>
+<p>另外，Java语言中字段时无法重载的，两个字段的数据类型、修饰符不管是否相同，都必须使用不一样的名称。但是对于字节码而言，如果两个字段的描述符不一致，那么字段重名就是合法的。</p>
+<h3 id="八、方法表集合"><a href="#八、方法表集合" class="headerlink" title="八、方法表集合"></a>八、方法表集合</h3><p>Class文件存储格式中对方法的描述对字段的描述几乎采用了完全一致的方式。方法表的结构同字段表一样，如下图所示：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>名称</th>
+<th>数量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>u2</td>
+<td>access_flags</td>
+<td>1</td>
+</tr>
+<tr>
+<td>u2</td>
+<td>name_index</td>
+<td>1</td>
+</tr>
+<tr>
+<td>u2</td>
+<td>descriptor_index</td>
+<td>1</td>
+</tr>
+<tr>
+<td>u2</td>
+<td>attributes_count</td>
+<td>1</td>
+</tr>
+<tr>
+<td>attribute_info</td>
+<td>attributes</td>
+<td>attributes_count</td>
+</tr>
+</tbody>
+</table>
+<p>这些数据项目的含义与字段表集合也非常类似，仅在访问标志和属性表集合的可选项中有所区别。</p>
+<p>对于方法表，可以设置的标志位和含义见下表：</p>
+<table>
+<thead>
+<tr>
+<th>标志名称</th>
+<th>标志值</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ACC_PUBLIC</td>
+<td>0x00 01</td>
+<td>方法是否为public</td>
+</tr>
+<tr>
+<td>ACC_PRIVATE</td>
+<td>0x00 02</td>
+<td>方法是否为private</td>
+</tr>
+<tr>
+<td>ACC_PROTECTED</td>
+<td>0x00 04</td>
+<td>方法是否为protected</td>
+</tr>
+<tr>
+<td>ACC_STATIC</td>
+<td>0x00 08</td>
+<td>方法是否为static</td>
+</tr>
+<tr>
+<td>ACC_FINAL</td>
+<td>0x00 10</td>
+<td>方法是否为final</td>
+</tr>
+<tr>
+<td>ACC_SYHCHRONRIZED</td>
+<td>0x00 20</td>
+<td>方法是否为synchronized</td>
+</tr>
+<tr>
+<td>ACC_BRIDGE</td>
+<td>0x00 40</td>
+<td>方法是否是有编译器产生的方法</td>
+</tr>
+<tr>
+<td>ACC_VARARGS</td>
+<td>0x00 80</td>
+<td>方法是否接受参数</td>
+</tr>
+<tr>
+<td>ACC_NATIVE</td>
+<td>0x01 00</td>
+<td>方法是否为native</td>
+</tr>
+<tr>
+<td>ACC_ABSTRACT</td>
+<td>0x04 00</td>
+<td>方法是否为abstract</td>
+</tr>
+<tr>
+<td>ACC_STRICTFP</td>
+<td>0x08 00</td>
+<td>方法是否为strictfp</td>
+</tr>
+<tr>
+<td>ACC_SYNTHETIC</td>
+<td>0x10 00</td>
+<td>方法是否是有编译器自动产生的</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p> 看到这里，可能有的读者会产生疑问，方法的定义可以通过访问标志、名称索引、描述符表达清楚，但方法里面的代码到哪里去了？事实上，方法里面的Java代码，经过编译器编译成字节码指令后，存放在方法属性表集合中一个名为“Code”的属性里面，属性表是Class文件格式中最具扩展性的一种数据项目。</p>
+</blockquote>
+<p>例如，我们以前面的Class为例：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-10-15/21758686.jpg" alt=""></p>
+<ol>
+<li>方法的入口地址为0x00000101，第一个u2类型的数据（即是计数器容量）值为0x0002，代表集合的有两个方法（这两个方法是编译器添加的实例构造器<code>&lt;init&gt;</code>和源码中的方法<code>inc()</code>）。</li>
+<li>第一个方法的的访问标志值为0x001，也就是只有ACC_PUBLIC标志为真，名称索引值为0x0007，指向常量池的第7个常量，查找得其值为<code>&quot;&lt;init&gt;&quot;</code>，描述符索引值为0x0008，指向常量池第8个常量，对应值为“()V”，属性表计数器attributes_count的值为0x0001，表示此方法的属性表集合有一项属性，属性名称索引为0x0009，对应常量为“Code”，说明此属性的方法的字节码描述。</li>
+</ol>
+<p>与字段表集合相对应的是，如果父类方法在子类中没有被重写，方法表集合中就不会出现父类方法的信息。当同样的，有可能会出现编译器自动添加的方法，如：类构造器<code>&quot;&lt;clinit&gt;&quot;</code>方法、实例构造器<code>&quot;&lt;init&gt;&quot;</code>方法。</p>
+<p>在Java语言中，要重载一个方法，除了要与原方法具有相同的简单名称之外，还要求必须拥有一个与原方法不同的特征签名。</p>
+<blockquote>
+<p>对于方法签名：</p>
+<ul>
+<li>Java代码的方法特征签名包括方法名称、参数顺序及参数类型。</li>
+<li>字节码的方法特征签名除了上面这些，还包括方法返回值以及收查异常表。</li>
+</ul>
+</blockquote>
+<h3 id="九、属性表集合"><a href="#九、属性表集合" class="headerlink" title="九、属性表集合"></a>九、属性表集合</h3>
       
     </div>
     
@@ -1054,7 +1435,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、概述"><span class="nav-number">1.</span> <span class="nav-text">一、概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、魔数"><span class="nav-number">2.</span> <span class="nav-text">二、魔数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、Class文件的版本"><span class="nav-number">3.</span> <span class="nav-text">三、Class文件的版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四、常量池"><span class="nav-number">4.</span> <span class="nav-text">四、常量池</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#（一）常量池大小"><span class="nav-number">4.1.</span> <span class="nav-text">（一）常量池大小</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（二）常量池存放类型"><span class="nav-number">4.2.</span> <span class="nav-text">（二）常量池存放类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（三）常量池具体类型"><span class="nav-number">4.3.</span> <span class="nav-text">（三）常量池具体类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（四）常量项的结构定义"><span class="nav-number">4.4.</span> <span class="nav-text">（四）常量项的结构定义</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、概述"><span class="nav-number">1.</span> <span class="nav-text">一、概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、魔数"><span class="nav-number">2.</span> <span class="nav-text">二、魔数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、Class文件的版本"><span class="nav-number">3.</span> <span class="nav-text">三、Class文件的版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四、常量池"><span class="nav-number">4.</span> <span class="nav-text">四、常量池</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#（一）常量池大小"><span class="nav-number">4.1.</span> <span class="nav-text">（一）常量池大小</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（二）常量池存放类型"><span class="nav-number">4.2.</span> <span class="nav-text">（二）常量池存放类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（三）常量池具体类型"><span class="nav-number">4.3.</span> <span class="nav-text">（三）常量池具体类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（四）常量项的结构定义"><span class="nav-number">4.4.</span> <span class="nav-text">（四）常量项的结构定义</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#五、访问标志"><span class="nav-number">5.</span> <span class="nav-text">五、访问标志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#六、类索引、父类索引与接口索引集合"><span class="nav-number">6.</span> <span class="nav-text">六、类索引、父类索引与接口索引集合</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#七、字段表集合"><span class="nav-number">7.</span> <span class="nav-text">七、字段表集合</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-access-flags"><span class="nav-number">7.0.1.</span> <span class="nav-text">1. access_flags</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-name-index和descriptor-index"><span class="nav-number">7.0.2.</span> <span class="nav-text">2. name_index和descriptor_index</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-attributes"><span class="nav-number">7.0.3.</span> <span class="nav-text">3. attributes</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#八、方法表集合"><span class="nav-number">8.</span> <span class="nav-text">八、方法表集合</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#九、属性表集合"><span class="nav-number">9.</span> <span class="nav-text">九、属性表集合</span></a></li></ol></div>
             
 
           </div>

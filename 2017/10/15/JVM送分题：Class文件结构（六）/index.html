@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,JVM,内存管理,深入理解Java虚拟机," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="在Java中，通过Javac将Java程序编译成字节码Class文件，而Class文件可以被虚拟机JVM加载执行，从而实现了平台无关的特性，在本节，我们将介绍Class类文件的结构。">
+<meta name="keywords" content="Java,JVM,内存管理,深入理解Java虚拟机">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM送分题：Class文件结构（五）">
+<meta property="og:url" content="https://LINhunger.github.io/2017/10/15/JVM送分题：Class文件结构（六）/index.html">
+<meta property="og:site_name" content="小排骨和他的小霸王学习机">
+<meta property="og:description" content="在Java中，通过Javac将Java程序编译成字节码Class文件，而Class文件可以被虚拟机JVM加载执行，从而实现了平台无关的特性，在本节，我们将介绍Class类文件的结构。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-10-14/91538459.jpg">
+<meta property="og:updated_time" content="2017-10-15T01:57:47.447Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JVM送分题：Class文件结构（五）">
+<meta name="twitter:description" content="在Java中，通过Javac将Java程序编译成字节码Class文件，而Class文件可以被虚拟机JVM加载执行，从而实现了平台无关的特性，在本节，我们将介绍Class类文件的结构。">
+<meta name="twitter:image" content="http://opmjieyki.bkt.clouddn.com/17-10-14/91538459.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '2HS2W2NK4P',
+      apiKey: '161bd5753774a3f862efb9e010c5a870',
+      indexName: 'hunger_blog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://LINhunger.github.io/2017/10/15/JVM送分题：Class文件结构（六）/"/>
+
+
+
+
+
+  <title>JVM送分题：Class文件结构（五） | 小排骨和他的小霸王学习机</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小排骨和他的小霸王学习机</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">千万不要懒惰久了，努力一下就以为是在拼命。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-主页">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            主页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-归档">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-分类">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://LINhunger.github.io/2017/10/15/JVM送分题：Class文件结构（六）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="林寒弋">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/touxiang1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小排骨和他的小霸王学习机">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline" style="font-size:45px">JVM送分题：Class文件结构（五）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-15T09:35:22+08:00">
+                2017-10-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM虚拟机/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM虚拟机</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在Java中，通过Javac将Java程序编译成字节码Class文件，而Class文件可以被虚拟机JVM加载执行，从而实现了平台无关的特性，在本节，我们将介绍Class类文件的结构。</p>
+<a id="more"></a>
+<h3 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h3><p>Class文件是一组以8位字节为基础单位的二进制流，各个数据项目严格按照顺序紧凑地排列在Class文件之中，中间没有添加任何分隔符，这使得整个Class文件中存储的内容几乎全部是程序运行的必要数据，没有空隙存在。</p>
+<p>当遇到8位字节以上的数据项时，则会按照高位在前的方式分割成若干个8位字节进行存储。</p>
+<p>Class文件格式采用一种类似于C语言结构体的伪结构来存储数据，这种伪结构只有两种数据类型：无符号数和表。</p>
+<ul>
+<li>无符号数属于基本的数据类型，以u1、u2、u4、u8来分别代表1个字节、2个字节、4个字节和8个字节的无符号数，<strong>无符号数可以用来描述数字、索引引用、数量值或者按照UTF-8编码构成字符串。</strong></li>
+<li>表是由多个无符号数或者其他表作为数据项构成的复合数据类型，所有表的习惯地以<code>&quot;_info&quot;</code>结尾。表用于描述有层次关系的复合结构的数据，<strong>整个Class文件本质上就是一张表。</strong></li>
+</ul>
+<p>下面是Class文件格式的数据项构成：</p>
+<table>
+<thead>
+<tr>
+<th><strong>类型</strong></th>
+<th><strong>名称</strong></th>
+<th><strong>数量</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>u4</td>
+<td>magic</td>
+<td>1</td>
+</tr>
+<tr>
+<td>u2</td>
+<td>minor_version</td>
+<td>1</td>
+</tr>
+<tr>
+<td>u2</td>
+<td>major_version</td>
+<td>1</td>
+</tr>
+<tr>
+<td>u2</td>
+<td>constant_pool_count</td>
+<td>1</td>
+</tr>
+<tr>
+<td>cp_info</td>
+<td>constant_pool</td>
+<td>constant_pool_count - 1</td>
+</tr>
+<tr>
+<td>u2</td>
+<td>access_flags</td>
+<td>1</td>
+</tr>
+<tr>
+<td>u2</td>
+<td>this_class</td>
+<td>1</td>
+</tr>
+<tr>
+<td>u2</td>
+<td>super_class</td>
+<td>1</td>
+</tr>
+<tr>
+<td>u2</td>
+<td>interfaces_count</td>
+<td>1</td>
+</tr>
+<tr>
+<td>u2</td>
+<td>interfaces</td>
+<td>interfaces_count</td>
+</tr>
+<tr>
+<td>u2</td>
+<td>fields_count</td>
+<td>1</td>
+</tr>
+<tr>
+<td>field_info</td>
+<td>fields</td>
+<td>fields_count</td>
+</tr>
+<tr>
+<td>u2</td>
+<td>methods_count</td>
+<td>1</td>
+</tr>
+<tr>
+<td>method_info</td>
+<td>methods</td>
+<td>methods_count</td>
+</tr>
+<tr>
+<td>u2</td>
+<td>attribute_count</td>
+<td>1</td>
+</tr>
+<tr>
+<td>attribute_info</td>
+<td>attributes</td>
+<td>attributes_count</td>
+</tr>
+</tbody>
+</table>
+<p>无论是无符号数还是表，当需要描述同一类型但数量不定的多个数据时，经常会使用一个前置的容器计数器加若干个连续的数据项的形式。这是称这一系列连续的某一类型的数据为某一类型的集合。</p>
+<blockquote>
+<p>在Class文件中，无论是顺序还是数量，都是被严格限制的，哪个字节代表什么意义，长度是多少，先后顺序如何，都不允许改变。</p>
+</blockquote>
+<p>接下来，我们详细了解一下各个数据项的具体含义。</p>
+<h3 id="二、魔数"><a href="#二、魔数" class="headerlink" title="二、魔数"></a>二、魔数</h3><p>每个Class文件的头4个字节称为魔数（Magic Number），它的唯一作用是确定这个文件是否是一个能被虚拟机接受的Class文件。Class文件的魔数值为：0xCAFEBABY。</p>
+<h3 id="三、Class文件的版本"><a href="#三、Class文件的版本" class="headerlink" title="三、Class文件的版本"></a>三、Class文件的版本</h3><p>紧接着魔数的4个字节存储的是Class文件的版本号：前两个字节表示次版本号，后两个字节是主版本号。</p>
+<p>例如，JDK1.1能支持版本号为45.0~45.65535的Class文件，而JDK1.2则能支持45.0~46.65535的Class文件。高版本的JDK可以向下兼容以前版本的Class文件，但不能运行以后的Class文件，即使文件格式并未发生任何变化，虚拟机也会拒绝执行超过其版本号的Class文件。</p>
+<h3 id="四、常量池"><a href="#四、常量池" class="headerlink" title="四、常量池"></a>四、常量池</h3><p>紧接着主次版本号之后的是常量池入口，常量池可以理解为Class文件之中的资源仓库，它是Class文件与其他项目关联最多的数据类型，也是占用Class文件空间最大的数据项目之一，同时它还是在Class文件中第一个出现的表类型数据项目。</p>
+<h4 id="（一）常量池大小"><a href="#（一）常量池大小" class="headerlink" title="（一）常量池大小"></a>（一）常量池大小</h4><p>由于常量池的数量是不固定的，所以在常量池的入口需要放置一项u2类型的数据，代表常量池容量计数值（constant_pool_count）。值得注意的是，常量池的容量计数是从1而不是0开始的。</p>
+<p>假如一个Class文件的表示常量池容量的字段值为0x0016，即十进制的22，这就代表常量池有21项常量，索引值范围为1~21。<strong>这里空出了索引为0的情况，这样做的目的就在于满足后面某些指向常量池的索引值的数据在待定的情况下需要表达“不引用任何常量池项目”的含义。</strong></p>
+<p>Class文件中只有常量池的容量计数是从1开始的，对于其他集合类型，都是从0开始的。</p>
+<h4 id="（二）常量池存放类型"><a href="#（二）常量池存放类型" class="headerlink" title="（二）常量池存放类型"></a>（二）常量池存放类型</h4><p>常量池主要存放两大类常量：字面量和符号引用。</p>
+<p>字面量比较接近于java语言层面的常量概念，如文本字符串、声明为final的常量值等。</p>
+<p>符号引用则属于编译原理方面的概念，包括下面三类常量：</p>
+<ul>
+<li>类和接口的全限定名</li>
+<li>字段的名称和描述符</li>
+<li>方法的名称和描述符</li>
+</ul>
+<p>Java代码在进行javac编译的时候，并不像C++那样有<code>连接</code>这一步骤，而是在虚拟机加载Class文件的时候进行动态连接。</p>
+<p>也就是说在Class文件中不会保存各个方法、字段的最终内存布局信息，因此这些字段、方法的符号引用不经过运行期转换的话无法得到真正的内存入口地址，也就无法被虚拟机直接使用。当虚拟机运行的时候，需要从常量池中获得对应的符号引用，再在类创建时或运行时解析、翻译到具体的内存地址之中。</p>
+<h4 id="（三）常量池具体类型"><a href="#（三）常量池具体类型" class="headerlink" title="（三）常量池具体类型"></a>（三）常量池具体类型</h4><p>常量池中每一项常量都是一个表，在JDK1.7中，一共有14中结构各不相同的表结构。</p>
+<p>这14种表都有一个共同的特点，就是表开始的第一位是一个u1类型的标志位（tag）,代表当前这个常量属于那种常量类型。</p>
+<p>下面是这14中常量的具体含义：</p>
+<table>
+<thead>
+<tr>
+<th><strong>常量池中数据项类型</strong></th>
+<th><strong>类型标志</strong></th>
+<th><strong>类型描述</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CONSTANT_Utf8_info</td>
+<td>1</td>
+<td>UTF-8编码的Unicode字符串</td>
+</tr>
+<tr>
+<td>CONSTANT_Integer_info</td>
+<td>3</td>
+<td>int类型字面值</td>
+</tr>
+<tr>
+<td>CONSTANT_Float_info</td>
+<td>4</td>
+<td>float类型字面值</td>
+</tr>
+<tr>
+<td>CONSTANT_Long_info</td>
+<td>5</td>
+<td>long类型字面值</td>
+</tr>
+<tr>
+<td>CONSTANT_Double_info</td>
+<td>6</td>
+<td>double类型字面值</td>
+</tr>
+<tr>
+<td>CONSTANT_Class_info</td>
+<td>7</td>
+<td>对一个类或接口的符号引用</td>
+</tr>
+<tr>
+<td>CONSTANT_String_info</td>
+<td>8</td>
+<td>String类型字面值</td>
+</tr>
+<tr>
+<td>CONSTANT_Fieldref_info</td>
+<td>9</td>
+<td>对一个字段的符号引用</td>
+</tr>
+<tr>
+<td>CONSTANT_Methodref_info</td>
+<td>10</td>
+<td>对一个类中声明的方法的符号引用</td>
+</tr>
+<tr>
+<td>CONSTANT_InterfaceMethodref_info</td>
+<td>11</td>
+<td>对一个接口中声明的方法的符号引用</td>
+</tr>
+<tr>
+<td>CONSTANT_NameAndType_info</td>
+<td>12</td>
+<td>对一个字段或方法的部分符号引用</td>
+</tr>
+<tr>
+<td>CONSTANT_MethodHandle_info</td>
+<td>15</td>
+<td>标识方法句柄</td>
+</tr>
+<tr>
+<td>CONSTANT_MethodType_info</td>
+<td>16</td>
+<td>标识方法类型</td>
+</tr>
+<tr>
+<td>CONSTANT_InvokeDynamic_info</td>
+<td>18</td>
+<td>表示一个动态方法调用点</td>
+</tr>
+</tbody>
+</table>
+<p>看下面的例子：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-10-14/91538459.jpg" alt=""></p>
+<p>从上图Class文件的二进制码中可以看出，他的第一项常量的标志位（tag）是0x07，查找上表可知这个标志列属于CONSTANT_Class_info类型，此常量代表一个类或者接口的符号引用。</p>
+<p>下面我们查到CONSTANT_Class_info的结构：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>名称</th>
+<th>数量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>u1</td>
+<td>tag</td>
+<td>1</td>
+</tr>
+<tr>
+<td>u2</td>
+<td>name_index</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p>前面已经讲过，每个常量结构都会有一个tag标志位，用于区分常量类型；name_index是一个索引值，它指向常量池中一个常量（后面分析知道是CONSTANT_Utf8_info类型常量），此常量代表了这个类（或者接口）的全限定名。从上图中可以看出它的值为0x0002，即是表示指向了常量池中的第二项常量。</p>
+<p>继续查找第二项常量，发现其标志位为0x01，查表可知它表示一个CONSTANT_Utf8_info类型常量。CONSTANT_Utf8_info类型的结构如下表：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>名称</th>
+<th>数量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>u1</td>
+<td>tag</td>
+<td>1</td>
+</tr>
+<tr>
+<td>u2</td>
+<td>length</td>
+<td>1</td>
+</tr>
+<tr>
+<td>u1</td>
+<td>bytes</td>
+<td>length</td>
+</tr>
+</tbody>
+</table>
+<p>length值说明了这个UTF-8编码的字符串长度是多少字节，它后面跟着长度为length字节的连续数据是使用UTF-8缩略编码表示的字符串。</p>
+<p>UTF-8缩略编码和普通UTF-8编码的区别：</p>
+<ul>
+<li>从<code>\u0001</code>到<code>\u007f</code>之间的字符（相当于1~127的ASCII码），使用1个字节表示。</li>
+<li>从<code>\u0080</code>到<code>\u07ff</code>之间的字符，使用2个字节表示。</li>
+<li>从<code>\u0800</code>到<code>\uffff</code>之间的字符，使用3个字节表示。</li>
+<li>普通UTF-8编码的所有字符都使用3个字节表示。</li>
+</ul>
+<p>本例中，这个字符串的为0x001D，也就是长度29字节，往后的29个字节正好都在1~127的ASCII码范围内，内容为“org/fenixsoft/clazz/TestClass”。</p>
+<h4 id="（四）常量项的结构定义"><a href="#（四）常量项的结构定义" class="headerlink" title="（四）常量项的结构定义"></a>（四）常量项的结构定义</h4><p>最后，将14种常量项的结构定义总结为下表：</p>
+<table>
+<thead>
+<tr>
+<th>常量</th>
+<th style="text-align:center">项目</th>
+<th style="text-align:center">类型</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CONSTANT_Utf8_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为1</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">length</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">UF-8编码的字符串占用的字节数</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">bytes</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">长度为length的UTF-8编码的字符串</td>
+</tr>
+<tr>
+<td>CONSTANT_Integer_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为3</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">bytes</td>
+<td style="text-align:center">u4</td>
+<td style="text-align:left">按照高位在前存储的int值</td>
+</tr>
+<tr>
+<td>CONSTANT_Float_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为4</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">bytes</td>
+<td style="text-align:center">u4</td>
+<td style="text-align:left">按照高位在前存储的float值</td>
+</tr>
+<tr>
+<td>CONSTANT_Long_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为5</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">bytes</td>
+<td style="text-align:center">u8</td>
+<td style="text-align:left">按照高位在前存储的long值</td>
+</tr>
+<tr>
+<td>CONSTANT_Double_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为6</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">bytes</td>
+<td style="text-align:center">u8</td>
+<td style="text-align:left">按照高位在前存储的double值</td>
+</tr>
+<tr>
+<td>CONSTANT_Class_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为7</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">指向全限定名常量项的索引</td>
+</tr>
+<tr>
+<td>CONSTANT_String_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为8</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">指向字符串字面量的索引</td>
+</tr>
+<tr>
+<td>CONSTANT_Fieldref_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为9</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">指向声明字段的类或接口描述符CONSTANT_Class_info的索引项</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">指向字段名称及类型描述符CONSTANT_NameAndType_info的索引项</td>
+</tr>
+<tr>
+<td>CONSTANT_Methodref_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为10</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">指向声明方法的类描述符CONSTANT_Class_info的索引项</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">指向方法名称及类型描述符CONSTANT_NameAndType_info的索引项</td>
+</tr>
+<tr>
+<td>CONSTANT_InrerfaceMethodref_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为11</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">指向声明方法的接口描述符CONSTANT_Class_info的索引项</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">指向方法名称及类型描述符CONSTANT_NameAndType_info的索引项</td>
+</tr>
+<tr>
+<td>CONSTANT_NameAndType_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为12</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">指向字段或方法名称常量项目的索引</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">指向该字段或方法描述符常量项的索引</td>
+</tr>
+<tr>
+<td>CONSTANT_MethodHandle_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为15</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">reference_kind</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值必须是在1-9之间（包括1和9），它决定了方法句柄的类型。方法句柄类型的值表示方法句柄的字节码行为。</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">reference_index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">值必须是对常量池的有效索引</td>
+</tr>
+<tr>
+<td>CONSTANT_MethodType_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为16</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">descriptor_index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">值必须是对常量池的有效索引，常量池在该索引处的项必须是CONSTANT_Utf8_info结构，表示方法的描述符</td>
+</tr>
+<tr>
+<td>CONSTANT_InvokeDynamic_info</td>
+<td style="text-align:center">tag</td>
+<td style="text-align:center">u1</td>
+<td style="text-align:left">值为18</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">bootstrap_method_attr_index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">值必须是对当前Class文件中引导方法表的bootstrap_methods[]数组的有效索引</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center">name_and_type_index</td>
+<td style="text-align:center">u2</td>
+<td style="text-align:left">值必须是对当前常量池的有效索引，常量池在该索引处的项必须是CONSTANT_NameAndType_info结构，表示方法名和方法描述符</td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/JVM/" rel="tag"># JVM</a>
+          
+            <a href="/tags/内存管理/" rel="tag"># 内存管理</a>
+          
+            <a href="/tags/深入理解Java虚拟机/" rel="tag"># 深入理解Java虚拟机</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/10/JVM送分题：垃圾回收器（五）/" rel="next" title="JVM送分题：垃圾回收器（五）">
+                <i class="fa fa-chevron-left"></i> JVM送分题：垃圾回收器（五）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            <!--文章目录-->
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            <!--站点概览-->
+            站点概况
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          
+            <img class="site-author-image" itemprop="image"
+              src="/images/touxiang1.jpg"
+              alt="林寒弋" style="height: 130px; max-width: 130px" />
+          
+            <p class="site-author-name" itemprop="name">林寒弋</p>
+            <p class="site-description motion-element" itemprop="description">写完？写完是不可能的，这辈子都不可能写完的。编程我又不会，只有每天摸鱼，才维持了现在开心的样纸。</p>
+        </div>
+
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives">
+            
+                <span class="site-state-item-count">33</span>
+                <span class="site-state-item-name"><!--日志-->文章</span>
+              </a>
+            </div>
+          
+
+          
+              <div class="site-state-item site-state-categories">
+                  <a href="/categories">
+                      <span class="site-state-item-count">5</span>
+                      <span class="site-state-item-name"><!-- 分类 -->分类</span>
+                  </a>
+              </div>
+          
+          
+              <div class="site-state-item site-state-tags">
+                  <a href="/tags">
+                      <span class="site-state-item-count">26</span>
+                      <span class="site-state-item-name"><!-- 标签 -->标签</span>
+                  </a>
+              </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LINhunger" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>GitHub</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.vcoder.top" title="直播demo" target="_blank">直播demo</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、概述"><span class="nav-number">1.</span> <span class="nav-text">一、概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、魔数"><span class="nav-number">2.</span> <span class="nav-text">二、魔数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、Class文件的版本"><span class="nav-number">3.</span> <span class="nav-text">三、Class文件的版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四、常量池"><span class="nav-number">4.</span> <span class="nav-text">四、常量池</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#（一）常量池大小"><span class="nav-number">4.1.</span> <span class="nav-text">（一）常量池大小</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（二）常量池存放类型"><span class="nav-number">4.2.</span> <span class="nav-text">（二）常量池存放类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（三）常量池具体类型"><span class="nav-number">4.3.</span> <span class="nav-text">（三）常量池具体类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（四）常量项的结构定义"><span class="nav-number">4.4.</span> <span class="nav-text">（四）常量项的结构定义</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">林寒弋</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.2</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.2"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,Java基础,反射," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="Java反射机制可以让我们在运行期获得任何一个类的字节码。包括接口、变量、方法等信息。还可以让我们在运行期实例化对象，通过get/set方法获取变量的值。">
+<meta name="keywords" content="Java,Java基础,反射">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入理解Java反射机制">
+<meta property="og:url" content="https://LINhunger.github.io/2017/10/17/深入理解Java反射机制/index.html">
+<meta property="og:site_name" content="小排骨和他的小霸王学习机">
+<meta property="og:description" content="Java反射机制可以让我们在运行期获得任何一个类的字节码。包括接口、变量、方法等信息。还可以让我们在运行期实例化对象，通过get/set方法获取变量的值。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-10-17T17:14:48.781Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="深入理解Java反射机制">
+<meta name="twitter:description" content="Java反射机制可以让我们在运行期获得任何一个类的字节码。包括接口、变量、方法等信息。还可以让我们在运行期实例化对象，通过get/set方法获取变量的值。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '2HS2W2NK4P',
+      apiKey: '161bd5753774a3f862efb9e010c5a870',
+      indexName: 'hunger_blog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://LINhunger.github.io/2017/10/17/深入理解Java反射机制/"/>
+
+
+
+
+
+  <title>深入理解Java反射机制 | 小排骨和他的小霸王学习机</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?a9843d80b7b17180c3fa9725e42dd96e";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小排骨和他的小霸王学习机</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">千万不要懒惰久了，努力一下就以为是在拼命。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-主页">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            主页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-归档">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-分类">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://LINhunger.github.io/2017/10/17/深入理解Java反射机制/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="林寒弋">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/touxiang1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小排骨和他的小霸王学习机">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline" style="font-size:45px">深入理解Java反射机制</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-17T21:12:15+08:00">
+                2017-10-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java基础/" itemprop="url" rel="index">
+                    <span itemprop="name">Java基础</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Java反射机制可以让我们在运行期获得任何一个类的字节码。包括接口、变量、方法等信息。还可以让我们在运行期实例化对象，通过get/set方法获取变量的值。</p>
+<a id="more"></a>
+<h3 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h3><p>下面是一个小例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Method[] methods = MyObject.class.getMethods();</div><div class="line"></div><div class="line"><span class="keyword">for</span>(Method method : methods)&#123;</div><div class="line">    System.out.println(<span class="string">"method = "</span> + method.getName());</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个例子通过调用类的class属性获取对应的Class对象，通过这个Class对象获取MyObject类的方法集合。</p>
+<p><strong>反射的核心就是在JVM运行时才动态加载类或调用方法/访问属性，它不需要事先（写代码的时候或编译期）知道运行对象是谁。</strong></p>
+<p>Java反射框架主要提供以下功能：</p>
+<ol>
+<li>在运行时判断这个对象所属的类；</li>
+<li>在运行时构造任意一个类的对象；</li>
+<li>在运行时判断任意一个类所具有的成员变量和方法（甚至可以调用private方法或成员）；</li>
+<li>在运行时调用任意一个对象的方法。</li>
+</ol>
+<blockquote>
+<p>注意：是运行期而不是编译期。</p>
+</blockquote>
+<h3 id="二、反射的基本运用"><a href="#二、反射的基本运用" class="headerlink" title="二、反射的基本运用"></a>二、反射的基本运用</h3><p>这里我们介绍一个基本反射功能的实现。</p>
+<h4 id="（一）获得Class对象"><a href="#（一）获得Class对象" class="headerlink" title="（一）获得Class对象"></a>（一）获得Class对象</h4><p>方法有三种：</p>
+<h5 id="1-使用Class类的forName静态方法"><a href="#1-使用Class类的forName静态方法" class="headerlink" title="1. 使用Class类的forName静态方法"></a>1. 使用Class类的forName静态方法</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> Class&lt;?&gt; forName(String className);</div></pre></td></tr></table></figure>
+<h5 id="2-直接获取某一个对象的class"><a href="#2-直接获取某一个对象的class" class="headerlink" title="2. 直接获取某一个对象的class"></a>2. 直接获取某一个对象的class</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Class&lt;?&gt; klass = <span class="keyword">int</span>.class;</div><div class="line">Class&lt;?&gt; classInt = Integer.TYPE;</div></pre></td></tr></table></figure>
+<h5 id="3-调用对象的getClass-方法"><a href="#3-调用对象的getClass-方法" class="headerlink" title="3. 调用对象的getClass()方法"></a>3. 调用对象的getClass()方法</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">StringBuilder str = <span class="keyword">new</span> StringBuilder(<span class="string">"123"</span>);</div><div class="line">Class&lt;?&gt; klass = str.getClass();</div></pre></td></tr></table></figure>
+<h4 id="（二）判断是否为某个类的实例"><a href="#（二）判断是否为某个类的实例" class="headerlink" title="（二）判断是否为某个类的实例"></a>（二）判断是否为某个类的实例</h4><p>一般地，我们用instanceof关键字来判断是否为某个类的实例。同时我们也可以借助反射中的Class对象的isInstance()方法来判断是否为某个类的实例，它是一个Native方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">native</span> <span class="keyword">boolean</span> <span class="title">isInstance</span><span class="params">(Object obj)</span></span>;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>instanceof用法：boolean = object instanceof class;</p>
+</blockquote>
+<h4 id="（三）创建实例"><a href="#（三）创建实例" class="headerlink" title="（三）创建实例"></a>（三）创建实例</h4><p>通过反射来生成对象主要有两种方式。</p>
+<h5 id="1-使用Class对象的newInstance-方法"><a href="#1-使用Class对象的newInstance-方法" class="headerlink" title="1. 使用Class对象的newInstance()方法"></a>1. 使用Class对象的newInstance()方法</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Class&lt;?&gt; c = String.class;</div><div class="line">Object str = c.newInstance();</div></pre></td></tr></table></figure>
+<p>此处创建的对象是一个无参构造函数构造的，故原对象需要存在无参的构造方法。</p>
+<h5 id="2-通过Class对象获取指定的Constructor对象"><a href="#2-通过Class对象获取指定的Constructor对象" class="headerlink" title="2. 通过Class对象获取指定的Constructor对象"></a>2. 通过Class对象获取指定的Constructor对象</h5><p>先通过Class对象获取指定的Constructor对象，在调用Constructor对象的newInstance()方法来创建实例。这种方法可以用指定的构造器构造类的实例。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//获取String所对应的Class对象</span></div><div class="line">Class&lt;?&gt; c = String.class;</div><div class="line"><span class="comment">//获取String类带一个String参数的构造器</span></div><div class="line">Constructor constructor = c.getConstructor(String.class);</div><div class="line"><span class="comment">//根据构造器创建实例</span></div><div class="line">Object obj = constructor.newInstance(<span class="string">"23333"</span>);</div><div class="line">System.out.println(obj);</div></pre></td></tr></table></figure>
+<h4 id="（四）获取方法"><a href="#（四）获取方法" class="headerlink" title="（四）获取方法"></a>（四）获取方法</h4><p>获取某个Class对象的方法集合，主要有以下几个方法：</p>
+<h5 id="1-getDeclaredMethods"><a href="#1-getDeclaredMethods" class="headerlink" title="1. getDeclaredMethods()"></a>1. getDeclaredMethods()</h5><p>getDeclaredMethods()返回类或接口声明的所有方法，包括私有方法，但不包括继承的方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> Method[] getDeclaredMethods() <span class="keyword">throws</span> SecurityException</div></pre></td></tr></table></figure>
+<h5 id="2-getMethods"><a href="#2-getMethods" class="headerlink" title="2. getMethods()"></a>2. getMethods()</h5><p>getMethods()方法返回某个类所有公用（public）方法，包括继承类的公用方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> Method[] getMethods() <span class="keyword">throws</span> SecurityException</div></pre></td></tr></table></figure>
+<h5 id="3-getMethod"><a href="#3-getMethod" class="headerlink" title="3. getMethod"></a>3. getMethod</h5><p>getMethod方法返回一个特定的方法，其中第一个参数为方法名称，后面的参数为方法的参数对应的Class对象。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> Method <span class="title">getMethod</span><span class="params">(String name, Class&lt;?&gt;... parameterTypes)</span></span></div></pre></td></tr></table></figure>
+<p>下面通过一个例子来理解下面的方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> java.lang.reflect.InvocationTargetException;</div><div class="line"><span class="keyword">import</span> java.lang.reflect.Method;</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">test1</span> </span>&#123;</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> <span class="keyword">throws</span> IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException </span>&#123;</div><div class="line">		Class&lt;?&gt; c = methodClass.class;</div><div class="line">		Object object = c.newInstance();</div><div class="line">		Method[] methods = c.getMethods();</div><div class="line">		Method[] declaredMethods = c.getDeclaredMethods();</div><div class="line">		<span class="comment">//获取methodClass类的add方法</span></div><div class="line">		Method method = c.getMethod(<span class="string">"add"</span>, <span class="keyword">int</span>.class, <span class="keyword">int</span>.class);</div><div class="line">		<span class="comment">//getMethods()方法获取的所有方法</span></div><div class="line">		System.out.println(<span class="string">"getMethods获取的方法："</span>);</div><div class="line">		<span class="keyword">for</span>(Method m:methods)</div><div class="line">			System.out.println(m);</div><div class="line">		<span class="comment">//getDeclaredMethods()方法获取的所有方法</span></div><div class="line">		System.out.println(<span class="string">"getDeclaredMethods获取的方法："</span>);</div><div class="line">		<span class="keyword">for</span>(Method m:declaredMethods)</div><div class="line">			System.out.println(m);</div><div class="line">	    &#125;</div><div class="line">&#125;</div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">methodClass</span> </span>&#123;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> fuck = <span class="number">3</span>;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">add</span><span class="params">(<span class="keyword">int</span> a,<span class="keyword">int</span> b)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> a+b;</div><div class="line">    &#125;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">sub</span><span class="params">(<span class="keyword">int</span> a,<span class="keyword">int</span> b)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> a+b;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>程序运行结果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">getMethods获取的方法：</div><div class="line">public int org.ScZyhSoft.common.methodClass.add(int,int)</div><div class="line">public int org.ScZyhSoft.common.methodClass.sub(int,int)</div><div class="line">public final void java.lang.Object.wait() throws java.lang.InterruptedException</div><div class="line">public final void java.lang.Object.wait(long,int) throws java.lang.InterruptedException</div><div class="line">public final native void java.lang.Object.wait(long) throws java.lang.InterruptedException</div><div class="line">public boolean java.lang.Object.equals(java.lang.Object)</div><div class="line">public java.lang.String java.lang.Object.toString()</div><div class="line">public native int java.lang.Object.hashCode()</div><div class="line">public final native java.lang.Class java.lang.Object.getClass()</div><div class="line">public final native void java.lang.Object.notify()</div><div class="line">public final native void java.lang.Object.notifyAll()</div><div class="line">getDeclaredMethods获取的方法：</div><div class="line">public int org.ScZyhSoft.common.methodClass.add(int,int)</div><div class="line">public int org.ScZyhSoft.common.methodClass.sub(int,int)</div></pre></td></tr></table></figure>
+<p>可以看到，通过getMethods()获取的方法，包括父类的方法。</p>
+<h4 id="（五）获取构造器信息"><a href="#（五）获取构造器信息" class="headerlink" title="（五）获取构造器信息"></a>（五）获取构造器信息</h4><p>获取类构造器的用法与获取方法的用法类似。主要是通过Class类的getConstructor方法得到Constructor类的一个实例，而Constructor方法类中有一个newInstance方法可以创建一个对象实例。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> Constructor&lt;T&gt; <span class="title">getConstructor</span><span class="params">(Class&lt;?&gt;... parameterTypes)</span><span class="keyword">throws</span> NoSuchMethodException, SecurityException</span></div><div class="line"><span class="function"><span class="keyword">public</span> T <span class="title">newInstance</span><span class="params">(Object ... initargs)</span></span>;</div></pre></td></tr></table></figure>
+<h4 id="（六）获取类的成员变量信息"><a href="#（六）获取类的成员变量信息" class="headerlink" title="（六）获取类的成员变量信息"></a>（六）获取类的成员变量信息</h4><p>getFiled: 访问公有的成员变量。<br>getDeclaredField：所有已声明的成员变量。但不能得到其父类的成员变量。<br>getFileds和getDeclaredFields用法同上（参照Method）。</p>
+<h4 id="（七）调用方法"><a href="#（七）调用方法" class="headerlink" title="（七）调用方法"></a>（七）调用方法</h4><p>当我们从类获取了一个方法之后，我们可以用invoke()方法来调用这个方法。invoke方法的生命如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object obj, Object... args)</span> <span class="keyword">throws</span> IllegalAccessException, IllegalArgumentException, InvocationTargetException</span></div></pre></td></tr></table></figure>
+<p>下面是一个例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">test1</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException </span>&#123;</div><div class="line">        Class&lt;?&gt; klass = methodClass.class;</div><div class="line">        <span class="comment">//创建methodClass的实例</span></div><div class="line">        Object obj = klass.newInstance();</div><div class="line">        <span class="comment">//获取methodClass类的add方法</span></div><div class="line">        Method method = klass.getMethod(<span class="string">"add"</span>,<span class="keyword">int</span>.class,<span class="keyword">int</span>.class);</div><div class="line">        <span class="comment">//调用method对应的方法 =&gt; add(1,4)</span></div><div class="line">        Object result = method.invoke(obj,<span class="number">1</span>,<span class="number">4</span>);</div><div class="line">        System.out.println(result);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">methodClass</span> </span>&#123;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> fuck = <span class="number">3</span>;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">add</span><span class="params">(<span class="keyword">int</span> a,<span class="keyword">int</span> b)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> a+b;</div><div class="line">    &#125;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">sub</span><span class="params">(<span class="keyword">int</span> a,<span class="keyword">int</span> b)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> a+b;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="（八）利用反射创建数组"><a href="#（八）利用反射创建数组" class="headerlink" title="（八）利用反射创建数组"></a>（八）利用反射创建数组</h4><p>数组是Java里比较特殊的类型，它可以赋值给一个Obcjet引用。下面是一个利用反射创建数组的例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">testArray</span><span class="params">()</span> <span class="keyword">throws</span> ClassNotFoundException </span>&#123;</div><div class="line">        Class&lt;?&gt; cls = Class.forName(<span class="string">"java.lang.String"</span>);</div><div class="line">        Object array = Array.newInstance(cls,<span class="number">25</span>);</div><div class="line">        <span class="comment">//往数组里添加内容</span></div><div class="line">        Array.set(array,<span class="number">0</span>,<span class="string">"hello"</span>);</div><div class="line">        Array.set(array,<span class="number">1</span>,<span class="string">"Java"</span>);</div><div class="line">        Array.set(array,<span class="number">2</span>,<span class="string">"fuck"</span>);</div><div class="line">        Array.set(array,<span class="number">3</span>,<span class="string">"Scala"</span>);</div><div class="line">        Array.set(array,<span class="number">4</span>,<span class="string">"Clojure"</span>);</div><div class="line">        <span class="comment">//获取某一项的内容</span></div><div class="line">        System.out.println(Array.get(array,<span class="number">3</span>));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中的Array类为java.lang.reflect.Array类。我们通过Array.newInstance()创建数组对象，它的方法定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title">newInstance</span><span class="params">(Class&lt;?&gt; componentType, <span class="keyword">int</span> length)</span></span></div><div class="line"><span class="function">        <span class="keyword">throws</span> NegativeArraySizeException </span>&#123;</div><div class="line">    	<span class="keyword">return</span> newArray(componentType, length);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>而newArray()方法是一个Native方法，它的源码如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">arrayOop Reflection::reflect_new_array(oop element_mirror, jint length, TRAPS) &#123;</div><div class="line">  <span class="keyword">if</span> (element_mirror == <span class="literal">NULL</span>) &#123;</div><div class="line">    THROW_0(vmSymbols::java_lang_NullPointerException());</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">if</span> (length &lt; <span class="number">0</span>) &#123;</div><div class="line">    THROW_0(vmSymbols::java_lang_NegativeArraySizeException());</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">if</span> (java_lang_Class::is_primitive(element_mirror)) &#123;</div><div class="line">    Klass* tak = basic_type_mirror_to_arrayklass(element_mirror, CHECK_NULL);</div><div class="line">    <span class="keyword">return</span> TypeArrayKlass::cast(tak)-&gt;allocate(length, THREAD);</div><div class="line">  &#125; <span class="keyword">else</span> &#123;</div><div class="line">    Klass* k = java_lang_Class::as_Klass(element_mirror);</div><div class="line">    <span class="keyword">if</span> (k-&gt;oop_is_array() &amp;&amp; ArrayKlass::cast(k)-&gt;dimension() &gt;= MAX_DIM) &#123;</div><div class="line">      THROW_0(vmSymbols::java_lang_IllegalArgumentException());</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> oopFactory::new_objArray(k, length, THREAD);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>另外，Array类的set()和get()方法都为Native方法。</p>
+<h3 id="三、反射的注意事项"><a href="#三、反射的注意事项" class="headerlink" title="三、反射的注意事项"></a>三、反射的注意事项</h3><ol>
+<li>反射会额外消耗一定的系统资源，因此如果不需要动态地创建一个对象，那么久不需要使用发射。</li>
+<li>反射调用方法时会忽略权限检查，因此可能会破坏封装性。</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Java基础/" rel="tag"># Java基础</a>
+          
+            <a href="/tags/反射/" rel="tag"># 反射</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/15/JVM送分题：Class文件结构（六）/" rel="next" title="JVM送分题：Class文件结构（六）">
+                <i class="fa fa-chevron-left"></i> JVM送分题：Class文件结构（六）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            <!--文章目录-->
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            <!--站点概览-->
+            站点概况
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          
+            <img class="site-author-image" itemprop="image"
+              src="/images/touxiang1.jpg"
+              alt="林寒弋" style="height: 130px; max-width: 130px" />
+          
+            <p class="site-author-name" itemprop="name">林寒弋</p>
+            <p class="site-description motion-element" itemprop="description">写完？写完是不可能的，这辈子都不可能写完的。编程我又不会，只有每天摸鱼，才维持了现在开心的样纸。</p>
+        </div>
+
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives">
+            
+                <span class="site-state-item-count">34</span>
+                <span class="site-state-item-name"><!--日志-->文章</span>
+              </a>
+            </div>
+          
+
+          
+              <div class="site-state-item site-state-categories">
+                  <a href="/categories">
+                      <span class="site-state-item-count">6</span>
+                      <span class="site-state-item-name"><!-- 分类 -->分类</span>
+                  </a>
+              </div>
+          
+          
+              <div class="site-state-item site-state-tags">
+                  <a href="/tags">
+                      <span class="site-state-item-count">27</span>
+                      <span class="site-state-item-name"><!-- 标签 -->标签</span>
+                  </a>
+              </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LINhunger" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>GitHub</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.vcoder.top" title="直播demo" target="_blank">直播demo</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、概述"><span class="nav-number">1.</span> <span class="nav-text">一、概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、反射的基本运用"><span class="nav-number">2.</span> <span class="nav-text">二、反射的基本运用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#（一）获得Class对象"><span class="nav-number">2.1.</span> <span class="nav-text">（一）获得Class对象</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-使用Class类的forName静态方法"><span class="nav-number">2.1.1.</span> <span class="nav-text">1. 使用Class类的forName静态方法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-直接获取某一个对象的class"><span class="nav-number">2.1.2.</span> <span class="nav-text">2. 直接获取某一个对象的class</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-调用对象的getClass-方法"><span class="nav-number">2.1.3.</span> <span class="nav-text">3. 调用对象的getClass()方法</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（二）判断是否为某个类的实例"><span class="nav-number">2.2.</span> <span class="nav-text">（二）判断是否为某个类的实例</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（三）创建实例"><span class="nav-number">2.3.</span> <span class="nav-text">（三）创建实例</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-使用Class对象的newInstance-方法"><span class="nav-number">2.3.1.</span> <span class="nav-text">1. 使用Class对象的newInstance()方法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-通过Class对象获取指定的Constructor对象"><span class="nav-number">2.3.2.</span> <span class="nav-text">2. 通过Class对象获取指定的Constructor对象</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（四）获取方法"><span class="nav-number">2.4.</span> <span class="nav-text">（四）获取方法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-getDeclaredMethods"><span class="nav-number">2.4.1.</span> <span class="nav-text">1. getDeclaredMethods()</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-getMethods"><span class="nav-number">2.4.2.</span> <span class="nav-text">2. getMethods()</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-getMethod"><span class="nav-number">2.4.3.</span> <span class="nav-text">3. getMethod</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（五）获取构造器信息"><span class="nav-number">2.5.</span> <span class="nav-text">（五）获取构造器信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（六）获取类的成员变量信息"><span class="nav-number">2.6.</span> <span class="nav-text">（六）获取类的成员变量信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（七）调用方法"><span class="nav-number">2.7.</span> <span class="nav-text">（七）调用方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（八）利用反射创建数组"><span class="nav-number">2.8.</span> <span class="nav-text">（八）利用反射创建数组</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、反射的注意事项"><span class="nav-number">3.</span> <span class="nav-text">三、反射的注意事项</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">林寒弋</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.2</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.2"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

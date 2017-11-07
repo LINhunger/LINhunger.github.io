@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="MySQL,数据库,性能优化,索引," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="一般的应用系统，读写比例在10:1左右，而且插入操作和一般的更新操作很少出现性能问题。遇到最多的，还是一些复杂的查询操作，所以查询语句的优化显然是重中之重。">
+<meta name="keywords" content="MySQL,数据库,性能优化,索引">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL：索引原理及优化（一）">
+<meta property="og:url" content="https://LINhunger.github.io/2017/11/07/MySQL：索引原理及优化（一）/index.html">
+<meta property="og:site_name" content="小排骨和他的小霸王学习机">
+<meta property="og:description" content="一般的应用系统，读写比例在10:1左右，而且插入操作和一般的更新操作很少出现性能问题。遇到最多的，还是一些复杂的查询操作，所以查询语句的优化显然是重中之重。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-11-7/28367684.jpg">
+<meta property="og:updated_time" content="2017-11-07T15:01:30.164Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MySQL：索引原理及优化（一）">
+<meta name="twitter:description" content="一般的应用系统，读写比例在10:1左右，而且插入操作和一般的更新操作很少出现性能问题。遇到最多的，还是一些复杂的查询操作，所以查询语句的优化显然是重中之重。">
+<meta name="twitter:image" content="http://opmjieyki.bkt.clouddn.com/17-11-7/28367684.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '2HS2W2NK4P',
+      apiKey: '161bd5753774a3f862efb9e010c5a870',
+      indexName: 'hunger_blog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://LINhunger.github.io/2017/11/07/MySQL：索引原理及优化（一）/"/>
+
+
+
+
+
+  <title>MySQL：索引原理及优化（一） | 小排骨和他的小霸王学习机</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?a9843d80b7b17180c3fa9725e42dd96e";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小排骨和他的小霸王学习机</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">千万不要懒惰久了，努力一下就以为是在拼命。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-主页">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            主页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-归档">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-分类">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://LINhunger.github.io/2017/11/07/MySQL：索引原理及优化（一）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="林寒弋">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/touxiang1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小排骨和他的小霸王学习机">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline" style="font-size:45px">MySQL：索引原理及优化（一）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-07T15:48:32+08:00">
+                2017-11-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/MySQL/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>一般的应用系统，读写比例在10:1左右，而且插入操作和一般的更新操作很少出现性能问题。遇到最多的，还是一些复杂的查询操作，所以查询语句的优化显然是重中之重。</p>
+<a id="more"></a>
+<h3 id="一、Mysql索引原理"><a href="#一、Mysql索引原理" class="headerlink" title="一、Mysql索引原理"></a>一、Mysql索引原理</h3><h4 id="（一）索引原理"><a href="#（一）索引原理" class="headerlink" title="（一）索引原理"></a>（一）索引原理</h4><p>索引的目的在于提高查询效率，可以类比字典。比如，要查找“mysql”这个单词，我们首先需要定位到m字母，然后从上往下找到y字母，然后再找到剩下的sql。如果没有索引，那么你可能需要把所有单词都看一篇才能找到你想要的。</p>
+<p>同样的，对于数据库，最简单的如果1000条数据，1到100分成第一段，以此类推分成10段，这样在查询第250条数据的时候，只要查找第三段就可以了，一下子去除了90%不必要的数据。</p>
+<h4 id="（二）磁盘IO与预读"><a href="#（二）磁盘IO与预读" class="headerlink" title="（二）磁盘IO与预读"></a>（二）磁盘IO与预读</h4><p>这里先简单介绍一些磁盘IO和预读，磁盘读取数据靠的是机械运动，每次读取数据花费的时间可以分为寻道时间、旋转延迟、传输时间三个部分：</p>
+<ul>
+<li>寻道时间指的是磁臂移动到指定磁道所需要的时间，主流磁盘一般在5ms以下；</li>
+<li>旋转延迟就是我们经常听说的磁盘转速，比如一个磁盘7200转，表示每分钟能转7200次，也就是说1秒钟可转120次，旋转延迟就是1/120/2 = 4.17ms;</li>
+<li>传输时间指的是从磁盘读出或将数据写入磁盘的时间，一般在零点几毫秒，相对于前面两个时间可以忽略不计。</li>
+</ul>
+<p>那么访问一次磁盘的时间，即一次磁盘IO的时间约为9ms。这在计算机已经算是非常高昂的操作了。因此，计算机操作系统做了一些优化，当一次IO时，不光把当前磁盘的数据，而且还把相邻的数据也读到内存缓冲区内，因为局部预读性原理告诉我们，当计算机访问一个地址的数据时，与其相邻的数据也会很快被访问到。每次IO读取的数据我们称之为一页。具体一页多大数据和具体的操作系统有关，一般为4k到8k，也就是我们读取一页内数据的时候，实际上才发生了一次IO。</p>
+<h4 id="（三）索引的数据结构"><a href="#（三）索引的数据结构" class="headerlink" title="（三）索引的数据结构"></a>（三）索引的数据结构</h4><p>利用索引，我们就可以将查找数据时的磁盘IO次数控制在一个很小的数量级。这样便提高了查询效率。因此，数据库选择B+树作为其索引的数据结构。</p>
+<h5 id="1-b-数查找过程"><a href="#1-b-数查找过程" class="headerlink" title="1. b+数查找过程"></a>1. b+数查找过程</h5><p><img src="http://opmjieyki.bkt.clouddn.com/17-11-7/28367684.jpg" alt=""></p>
+<p>如上图，是一颗b+树，这里只说一些重点，浅蓝色的块我们称之为一个磁盘块，可以看到每个磁盘块包含几个数据项（深蓝色所示）和指针（黄色所示），如磁盘块1包含数据项17和35，包含指针P1、P2、P3，P1表示小于17的磁盘块，P2表示在17和35之间的磁盘块，P3表示大于35的磁盘块。真实的数据存在于叶子节点即3、5、9、10、13、15、28、29、36、60、75、79、90、99。非叶子节点只不存储真实的数据，只存储指引搜索方向的数据项，如17、35并不真实存在于数据表中。</p>
+<p>如果要查找数据项29，那么查找过程如下：</p>
+<ol>
+<li>首先会把磁盘块1由磁盘加载到内存，此时发生一次IO，在内存中用二分查找确定29在17和35之间，锁定磁盘块1的P2指针，内存时间因为非常短（相比磁盘的IO）可以忽略不计；</li>
+<li>通过磁盘块1的P2指针的磁盘地址把磁盘块3由磁盘加载到内存，发生第二次IO，29在26和30之间，锁定磁盘块3的P2指针；</li>
+<li>通过指针加载磁盘块8到内存，发生第三次IO，同时内存中做二分查找找到29，结束查询，总计三次IO。</li>
+<li>真实的情况是，3层的b+树可以表示上百万的数据，如果上百万的数据查找只需要三次IO，性能提高将是巨大的，如果没有索引，每个数据项都要发生一次IO，那么总共需要百万次的IO，显然成本非常非常高。</li>
+</ol>
+<h5 id="2-b-树性质"><a href="#2-b-树性质" class="headerlink" title="2. b+树性质"></a>2. b+树性质</h5><p>通过上面的分析，我们知道IO次数取决于b+树的高度h，假设当前数据表的数据为N，每个磁盘的数据项的数量为m，则有 </p>
+<p>​    h = log(m+1)N</p>
+<p>当数据量N一定的情况下，m越大，h越小；而m=磁盘块的大小/数据项的大小，磁盘块的大小也就是数据页的大小，是固定的，如果数据项占用的空间越小，数据项的数量就越多。相应地，树的高度也就越低。</p>
+<p>这就是为什么b+数要求把真实的数据放在叶子节点上而不是内层节点，因为一旦放在内层节点，磁盘块的数据项会大幅度下降，导致树增高。</p>
+<h5 id="3-索引的匹配原则"><a href="#3-索引的匹配原则" class="headerlink" title="3. 索引的匹配原则"></a>3. 索引的匹配原则</h5><p>当b+树的数据项是复合的数据结构，比如(name,age,sex)的时候，b+数是按照从左到右的顺序来建立搜索树的。</p>
+<p>比如当(张三,20,F)这样的数据来检索的时候，b+树会优先比较name来确定下一步的所搜方向，如果name相同再依次比较age和sex，最后得到检索的数据；</p>
+<p>但当(20,F)这样的没有name的数据来的时候，b+树就不知道下一步该查哪个节点，因为建立搜索树的时候name就是第一个比较因子，必须要先根据name来搜索才能知道下一步去哪里查询。</p>
+<p>比如当(张三,F)这样的数据来检索时，b+树可以用name来指定搜索方向，但下一个字段age的缺失，所以只能把名字等于张三的数据都找到，然后再匹配性别是F的数据了， 这个是非常重要的性质，即索引的最左匹配特性。</p>
+<h4 id="（四）建立索引的原则"><a href="#（四）建立索引的原则" class="headerlink" title="（四）建立索引的原则"></a>（四）建立索引的原则</h4><ol>
+<li>最左前缀匹配原则，MySQL会一直向右匹配知道遇到范围查询（&gt;、&lt;、between、like）就停止匹配。比如a = 1 and b = 2 and c &gt; 3 and d = 4 如果建立(a,b,c,d)顺序的索引，d是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d的顺序可以任意调整。</li>
+<li>=和in可以乱序，比如a = 1 and b = 2 and c = 3 建立(a,b,c)索引可以任意顺序，mysql的查询优化器会帮你优化成索引可以识别的形式。</li>
+<li>尽量选择where后面的判断列来作为索引。</li>
+<li>尽量的扩展索引，不要新建索引。比如表中已经有a的索引，现在要加(a,b)的索引，那么只需要修改原来的索引即可。</li>
+</ol>
+<h3 id="二、慢查询优化"><a href="#二、慢查询优化" class="headerlink" title="二、慢查询优化"></a>二、慢查询优化</h3><h4 id="（一）慢查询优化的基本步骤"><a href="#（一）慢查询优化的基本步骤" class="headerlink" title="（一）慢查询优化的基本步骤"></a>（一）慢查询优化的基本步骤</h4><ol>
+<li>先运行看看是否真的很慢，注意设置SQL_NO_CACHE;</li>
+<li>where条件单表查，锁定最小返回记录表。这句话的意思是把查询语句的where都应用到表中返回的记录数最小的表开始查起，单表每个字段分别查询，看哪个字段的区分度最高;</li>
+<li>explain查看执行计划，是否与1预期一致（从锁定记录较少的表开始查询）;</li>
+<li>order by limit 形式的sql语句让排序的表优先查;</li>
+<li>了解业务方使用场景;</li>
+<li>加索引时参照建索引的几大原则;</li>
+<li>观察结果，不符合预期继续从0分析。</li>
+</ol>
+<h4 id="（二）几个慢查询案例"><a href="#（二）几个慢查询案例" class="headerlink" title="（二）几个慢查询案例"></a>（二）几个慢查询案例</h4><p>下面几个例子详细解释了如何分析和优化慢查询：</p>
+<h5 id="1-复杂语句写法"><a href="#1-复杂语句写法" class="headerlink" title="1. 复杂语句写法"></a>1. 复杂语句写法</h5><p>很多情况下，我们写SQL只是为了实现功能，这只是第一步，不同的语句书写方式对于效率往往有本质的差别，这要求我们对MySQL的执行计划和索引原则有非常清楚的认识。请看下面语句：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">select</span></div><div class="line">   <span class="keyword">distinct</span> cert.emp_id </div><div class="line"><span class="keyword">from</span></div><div class="line">   cm_log cl </div><div class="line"><span class="keyword">inner</span> <span class="keyword">join</span></div><div class="line">   (</div><div class="line">      <span class="keyword">select</span></div><div class="line">         emp.id <span class="keyword">as</span> emp_id,</div><div class="line">         emp_cert.id <span class="keyword">as</span> cert_id </div><div class="line">      <span class="keyword">from</span></div><div class="line">         employee emp </div><div class="line">      <span class="keyword">left</span> <span class="keyword">join</span></div><div class="line">         emp_certificate emp_cert </div><div class="line">            <span class="keyword">on</span> emp.id = emp_cert.emp_id </div><div class="line">      <span class="keyword">where</span></div><div class="line">         emp.is_deleted=<span class="number">0</span></div><div class="line">   ) cert </div><div class="line">      <span class="keyword">on</span> (</div><div class="line">         cl.ref_table=<span class="string">'Employee'</span> </div><div class="line">         <span class="keyword">and</span> cl.ref_oid= cert.emp_id</div><div class="line">      ) </div><div class="line">      <span class="keyword">or</span> (</div><div class="line">         cl.ref_table=<span class="string">'EmpCertificate'</span> </div><div class="line">         <span class="keyword">and</span> cl.ref_oid= cert.cert_id</div><div class="line">      ) </div><div class="line"><span class="keyword">where</span></div><div class="line">   cl.last_upd_date &gt;=<span class="string">'2013-11-07 15:03:00'</span> </div><div class="line">   <span class="keyword">and</span> cl.last_upd_date&lt;=<span class="string">'2013-11-08 16:00:00'</span>;</div></pre></td></tr></table></figure>
+<ol>
+<li>先运行一下，53条记录 1.87秒，又没有用聚合语句，比较慢。</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">53 rows in <span class="keyword">set</span> (<span class="number">1.87</span> sec)</div></pre></td></tr></table></figure>
+<ol>
+<li>explain</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">+<span class="comment">----+-------------+------------+-------+---------------------------------+-----------------------+---------+-------------------+-------+--------------------------------+</span></div><div class="line">| id | select_type | table      | type  | possible_keys                   | key                   | key_len | ref               | rows  | Extra                          |</div><div class="line">+<span class="comment">----+-------------+------------+-------+---------------------------------+-----------------------+---------+-------------------+-------+--------------------------------+</span></div><div class="line">|  1 | PRIMARY     | cl         | range | cm_log_cls_id,idx_last_upd_date | idx_last_upd_date     | 8       | NULL              |   379 | Using where; Using temporary   |</div><div class="line">|  1 | PRIMARY     | &lt;derived2&gt; | ALL   | NULL                            | NULL                  | NULL    | NULL              | 63727 | Using where; Using join buffer |</div><div class="line">|  2 | DERIVED     | emp        | ALL   | NULL                            | NULL                  | NULL    | NULL              | 13317 | Using where                    |</div><div class="line">|  2 | DERIVED     | emp_cert   | ref   | emp_certificate_empid           | emp_certificate_empid | 4       | meituanorg.emp.id |     1 | Using index                    |</div><div class="line">+<span class="comment">----+-------------+------------+-------+---------------------------------+-----------------------+---------+-------------------+-------+--------------------------------+</span></div></pre></td></tr></table></figure>
+<p>简述一下执行计划，首先mysql根据idx_last_upd_date索引扫描cm_log表获得379条记录；</p>
+<p>然后查表扫描了63727条记录，分为两部分，derived表示构造表，也就是不存在的表，可以简单理解成是一个语句形成的结果集，后面的数字表示语句的ID。derived2表示的是ID = 2的查询构造了虚拟表，并且返回了63727条记录。</p>
+<p>我们再来看看ID = 2的语句究竟做了写什么返回了这么大量的数据，首先全表扫描employee表13317条记录，然后根据索引emp_certificate_empid关联emp_certificate表，rows = 1表示，每个关联都只锁定了一条记录，效率比较高。获得后，再和cm_log的379条记录根据规则关联。从执行过程上可以看出返回了太多的数据，返回的数据绝大部分cm_log都用不到，因为cm_log只锁定了379条记录。</p>
+<p>如何优化呢？可以看到我们在运行完后还是要和cm_log做join,那么我们能不能之前和cm_log做join呢？</p>
+<p>仔细分析语句不难发现，其基本思想是如果cm_log的ref_table是EmpCertificate就关联emp_certificate表，如果ref_table是Employee就关联employee表，我们完全可以拆成两部分，并用union连接起来，注意这里用union，而不用union all是因为原语句有“distinct”来得到唯一的记录，而union恰好具备了这种功能。如果原语句中没有distinct不需要去重，我们就可以直接使用union all了，因为使用union需要去重的动作，会影响SQL性能。</p>
+<p>优化过的语句如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">select</span></div><div class="line">   emp.id </div><div class="line"><span class="keyword">from</span></div><div class="line">   cm_log cl </div><div class="line"><span class="keyword">inner</span> <span class="keyword">join</span></div><div class="line">   employee emp </div><div class="line">      <span class="keyword">on</span> cl.ref_table = <span class="string">'Employee'</span> </div><div class="line">      <span class="keyword">and</span> cl.ref_oid = emp.id  </div><div class="line"><span class="keyword">where</span></div><div class="line">   cl.last_upd_date &gt;=<span class="string">'2013-11-07 15:03:00'</span> </div><div class="line">   <span class="keyword">and</span> cl.last_upd_date&lt;=<span class="string">'2013-11-08 16:00:00'</span> </div><div class="line">   <span class="keyword">and</span> emp.is_deleted = <span class="number">0</span>  </div><div class="line"><span class="keyword">union</span></div><div class="line"><span class="keyword">select</span></div><div class="line">   emp.id </div><div class="line"><span class="keyword">from</span></div><div class="line">   cm_log cl </div><div class="line"><span class="keyword">inner</span> <span class="keyword">join</span></div><div class="line">   emp_certificate ec </div><div class="line">      <span class="keyword">on</span> cl.ref_table = <span class="string">'EmpCertificate'</span> </div><div class="line">      <span class="keyword">and</span> cl.ref_oid = ec.id  </div><div class="line"><span class="keyword">inner</span> <span class="keyword">join</span></div><div class="line">   employee emp </div><div class="line">      <span class="keyword">on</span> emp.id = ec.emp_id  </div><div class="line"><span class="keyword">where</span></div><div class="line">   cl.last_upd_date &gt;=<span class="string">'2013-11-07 15:03:00'</span> </div><div class="line">   <span class="keyword">and</span> cl.last_upd_date&lt;=<span class="string">'2013-11-08 16:00:00'</span> </div><div class="line">   <span class="keyword">and</span> emp.is_deleted = <span class="number">0</span></div></pre></td></tr></table></figure>
+<p>4.不需要了解业务场景，只需要改造的语句和改造之前的语句保持结果一致</p>
+<p>5.现有索引可以满足，不需要建索引</p>
+<p>6.用改造后的语句实验一下，只需要10ms 降低了近200倍！</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">+----+--------------+------------+--------+---------------------------------+-------------------+---------+-----------------------+------+-------------+</div><div class="line">| id | select_type  | table      | type   | possible_keys                   | key               | key_len | ref                   | rows | Extra       |</div><div class="line">+----+--------------+------------+--------+---------------------------------+-------------------+---------+-----------------------+------+-------------+</div><div class="line">|  1 | PRIMARY      | cl         | range  | cm_log_cls_id,idx_last_upd_date | idx_last_upd_date | 8       | NULL                  |  379 | Using where |</div><div class="line">|  1 | PRIMARY      | emp        | eq_ref | PRIMARY                         | PRIMARY           | 4       | meituanorg.cl.ref_oid |    1 | Using where |</div><div class="line">|  2 | UNION        | cl         | range  | cm_log_cls_id,idx_last_upd_date | idx_last_upd_date | 8       | NULL                  |  379 | Using where |</div><div class="line">|  2 | UNION        | ec         | eq_ref | PRIMARY,emp_certificate_empid   | PRIMARY           | 4       | meituanorg.cl.ref_oid |    1 |             |</div><div class="line">|  2 | UNION        | emp        | eq_ref | PRIMARY                         | PRIMARY           | 4       | meituanorg.ec.emp_id  |    1 | Using where |</div><div class="line">| NULL | UNION RESULT | &lt;union1,2&gt; | ALL    | NULL                            | NULL              | NULL    | NULL                  | NULL |             |</div><div class="line">+----+--------------+------------+--------+---------------------------------+-------------------+---------+-----------------------+------+-------------+</div><div class="line">53 rows in set (0.01 sec)</div></pre></td></tr></table></figure>
+<h3 id="问题。"><a href="#问题。" class="headerlink" title="问题。"></a>问题。</h3><p>b+数的性质以及高度的问题。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+          
+            <a href="/tags/数据库/" rel="tag"># 数据库</a>
+          
+            <a href="/tags/性能优化/" rel="tag"># 性能优化</a>
+          
+            <a href="/tags/索引/" rel="tag"># 索引</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/01/JVM送分题：字节码执行引擎（八）/" rel="next" title="JVM送分题：字节码执行引擎（八）">
+                <i class="fa fa-chevron-left"></i> JVM送分题：字节码执行引擎（八）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            <!--文章目录-->
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            <!--站点概览-->
+            站点概况
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          
+            <img class="site-author-image" itemprop="image"
+              src="/images/touxiang1.jpg"
+              alt="林寒弋" style="height: 130px; max-width: 130px" />
+          
+            <p class="site-author-name" itemprop="name">林寒弋</p>
+            <p class="site-description motion-element" itemprop="description">写完？写完是不可能的，这辈子都不可能写完的。编程我又不会，只有每天摸鱼，才维持了现在开心的样纸。</p>
+        </div>
+
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives">
+            
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name"><!--日志-->文章</span>
+              </a>
+            </div>
+          
+
+          
+              <div class="site-state-item site-state-categories">
+                  <a href="/categories">
+                      <span class="site-state-item-count">7</span>
+                      <span class="site-state-item-name"><!-- 分类 -->分类</span>
+                  </a>
+              </div>
+          
+          
+              <div class="site-state-item site-state-tags">
+                  <a href="/tags">
+                      <span class="site-state-item-count">31</span>
+                      <span class="site-state-item-name"><!-- 标签 -->标签</span>
+                  </a>
+              </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LINhunger" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>GitHub</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.vcoder.top" title="直播demo" target="_blank">直播demo</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、Mysql索引原理"><span class="nav-number">1.</span> <span class="nav-text">一、Mysql索引原理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#（一）索引原理"><span class="nav-number">1.1.</span> <span class="nav-text">（一）索引原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（二）磁盘IO与预读"><span class="nav-number">1.2.</span> <span class="nav-text">（二）磁盘IO与预读</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（三）索引的数据结构"><span class="nav-number">1.3.</span> <span class="nav-text">（三）索引的数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-b-数查找过程"><span class="nav-number">1.3.1.</span> <span class="nav-text">1. b+数查找过程</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-b-树性质"><span class="nav-number">1.3.2.</span> <span class="nav-text">2. b+树性质</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-索引的匹配原则"><span class="nav-number">1.3.3.</span> <span class="nav-text">3. 索引的匹配原则</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（四）建立索引的原则"><span class="nav-number">1.4.</span> <span class="nav-text">（四）建立索引的原则</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、慢查询优化"><span class="nav-number">2.</span> <span class="nav-text">二、慢查询优化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#（一）慢查询优化的基本步骤"><span class="nav-number">2.1.</span> <span class="nav-text">（一）慢查询优化的基本步骤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（二）几个慢查询案例"><span class="nav-number">2.2.</span> <span class="nav-text">（二）几个慢查询案例</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-复杂语句写法"><span class="nav-number">2.2.1.</span> <span class="nav-text">1. 复杂语句写法</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题。"><span class="nav-number">3.</span> <span class="nav-text">问题。</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">林寒弋</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.2</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.2"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

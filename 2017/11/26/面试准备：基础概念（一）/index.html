@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,操作系统,面试准备,数据结构," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="一、操作系统中堆栈的区别（一）操作系统中堆和栈的区别栈：有操作系统自动分配释放，存放函数的参数值，局部变量的值等。其操作方式类似于数据结构中的栈； 堆：一般由程序员分配释放，若程序员不释放，程序结束时可能由OS回收，分配方式类似于链表。 （二）Java中堆栈的区别栈和堆都是Java用来在内存中存储数据的地方。与C++不同，Java自动管理堆和栈，程序员不能直接的设置堆和栈。  在函数中定义的一些">
+<meta name="keywords" content="Java,操作系统,面试准备,数据结构">
+<meta property="og:type" content="article">
+<meta property="og:title" content="面试准备：基本概念（一）">
+<meta property="og:url" content="https://LINhunger.github.io/2017/11/26/面试准备：基础概念（一）/index.html">
+<meta property="og:site_name" content="小排骨和他的小霸王学习机">
+<meta property="og:description" content="一、操作系统中堆栈的区别（一）操作系统中堆和栈的区别栈：有操作系统自动分配释放，存放函数的参数值，局部变量的值等。其操作方式类似于数据结构中的栈； 堆：一般由程序员分配释放，若程序员不释放，程序结束时可能由OS回收，分配方式类似于链表。 （二）Java中堆栈的区别栈和堆都是Java用来在内存中存储数据的地方。与C++不同，Java自动管理堆和栈，程序员不能直接的设置堆和栈。  在函数中定义的一些">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-11-26/94035721.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-11-26/46403907.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-11-26/48285435.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-11-26/93716245.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-11-26/93064527.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-11-26/66132704.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-11-26/38696026.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-11-26/41278159.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-11-26/17734783.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-11-26/40319836.jpg">
+<meta property="og:image" content="http://opmjieyki.bkt.clouddn.com/17-11-26/25904241.jpg">
+<meta property="og:updated_time" content="2017-11-27T08:05:41.305Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="面试准备：基本概念（一）">
+<meta name="twitter:description" content="一、操作系统中堆栈的区别（一）操作系统中堆和栈的区别栈：有操作系统自动分配释放，存放函数的参数值，局部变量的值等。其操作方式类似于数据结构中的栈； 堆：一般由程序员分配释放，若程序员不释放，程序结束时可能由OS回收，分配方式类似于链表。 （二）Java中堆栈的区别栈和堆都是Java用来在内存中存储数据的地方。与C++不同，Java自动管理堆和栈，程序员不能直接的设置堆和栈。  在函数中定义的一些">
+<meta name="twitter:image" content="http://opmjieyki.bkt.clouddn.com/17-11-26/94035721.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '2HS2W2NK4P',
+      apiKey: '161bd5753774a3f862efb9e010c5a870',
+      indexName: 'hunger_blog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://LINhunger.github.io/2017/11/26/面试准备：基础概念（一）/"/>
+
+
+
+
+
+  <title>面试准备：基本概念（一） | 小排骨和他的小霸王学习机</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?a9843d80b7b17180c3fa9725e42dd96e";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小排骨和他的小霸王学习机</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">千万不要懒惰久了，努力一下就以为是在拼命。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-主页">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            主页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-归档">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-分类">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://LINhunger.github.io/2017/11/26/面试准备：基础概念（一）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="林寒弋">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/touxiang1.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小排骨和他的小霸王学习机">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline" style="font-size:45px">面试准备：基本概念（一）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-26T13:43:38+08:00">
+                2017-11-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/面试准备/" itemprop="url" rel="index">
+                    <span itemprop="name">面试准备</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <a id="more"></a>
+<h3 id="一、操作系统中堆栈的区别"><a href="#一、操作系统中堆栈的区别" class="headerlink" title="一、操作系统中堆栈的区别"></a>一、操作系统中堆栈的区别</h3><h4 id="（一）操作系统中堆和栈的区别"><a href="#（一）操作系统中堆和栈的区别" class="headerlink" title="（一）操作系统中堆和栈的区别"></a>（一）操作系统中堆和栈的区别</h4><p>栈：有操作系统自动分配释放，存放函数的参数值，局部变量的值等。其操作方式类似于数据结构中的栈；</p>
+<p>堆：一般由程序员分配释放，若程序员不释放，程序结束时可能由OS回收，分配方式类似于链表。</p>
+<h4 id="（二）Java中堆栈的区别"><a href="#（二）Java中堆栈的区别" class="headerlink" title="（二）Java中堆栈的区别"></a>（二）Java中堆栈的区别</h4><p>栈和堆都是Java用来在内存中存储数据的地方。与C++不同，Java自动管理堆和栈，程序员不能直接的设置堆和栈。</p>
+<ol>
+<li>在函数中定义的一些基本类型的变量和对象的引用变量都在函数的栈内存中分配。</li>
+<li>当一段代码定义一个变量时，Java就在栈中就在栈中为整个变量分配内存空间，当超过变量的作用域后，Java就会自动释放掉该变量所分配的内存空间。</li>
+</ol>
+<p>堆内存呢？</p>
+<ol>
+<li>是用来存放new创建的对象和数组。</li>
+<li>在堆中分配的内存，是由Java虚拟机的自动垃圾回收器来管理的。</li>
+<li>在堆中产生了一个数组或对象后，还可以在栈中定义一个引用变量，这个变量的取值等于数组或对象在堆内存中的首地址，以后就可以在程序中使用栈的引用变量来访问堆中的数组或对象。</li>
+</ol>
+<h4 id="（三）java中变量在内存中的分配"><a href="#（三）java中变量在内存中的分配" class="headerlink" title="（三）java中变量在内存中的分配"></a>（三）java中变量在内存中的分配</h4><ol>
+<li>类变量（static修饰的变量）：在程序加载时系统就为他在堆中开辟了内存，堆中的内存地址存放于栈以便于高速访问。静态变量的周期一直持续到整个系统关闭。</li>
+<li>实例变量：当你使用Java关键字new创建一个对象时，系统在堆中开辟的并不是连续的内存空间而一般会是一堆零散的，然后根据零散的堆内存地址，通过哈希算法换算成一长串数字以表征这个变量在堆中的物理位置。实例变量在对它的引用丢失后，将被GC列入回收名单中。</li>
+<li>局部变量：声明在某方法中，执行到它的时候在栈开辟内存，一旦局部变量脱离作用域，内存立即释放。</li>
+</ol>
+<h3 id="二、Spring-IOC原理"><a href="#二、Spring-IOC原理" class="headerlink" title="二、Spring IOC原理"></a>二、Spring IOC原理</h3><p>IOC又叫做控制反转（Inversion of Control）.</p>
+<h4 id="（一）依赖倒置"><a href="#（一）依赖倒置" class="headerlink" title="（一）依赖倒置"></a>（一）依赖倒置</h4><p>什么是依赖倒置原则？</p>
+<p>比如我们设计一辆汽车：先设计轮子，然后根据轮子大小设计底盘，接着根据底盘设计车身，最后根据车身设计整个汽车。这里就出现了一个依赖的关系。</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-11-26/94035721.jpg" alt=""></p>
+<p>这样的设计看起来没问题，但是可维护性却很低。假设完工以后，上司却突然说市场需求的变动，要把车子的轮子的设计都改大一码。这下就蛋疼了：因为我们是根据轮子的尺寸设计的底盘，轮子的尺寸一改，底盘的设计就该修改，那也就是需要一连串的修改——整个设计都得修改。</p>
+<p>现在我们换一种思路。先设计汽车的大概样子，然后根据汽车的样子来设计车身，根据车身设计底盘，这样依赖关系就倒置过来了。</p>
+<p>这时候，如果我们需要改动轮子的设计，就不需要动底盘、车身、汽车的设计了。</p>
+<p>这就是依赖倒置原则——把原本的高层建筑依赖底层建筑“倒置”过来，编程底层建筑依赖高层建筑。高层建筑需要什么，底层需要实现这样的需求，但是高层并不管底层是怎么实现的。</p>
+<h4 id="（二）控制反转"><a href="#（二）控制反转" class="headerlink" title="（二）控制反转"></a>（二）控制反转</h4><p>控制反转（Inversion of Control）是依赖倒置原则的一种代码设计的思路。具体采用的方法就是所谓的依赖注入（Dependency Injection）。这几种概念的关系大致如下：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-11-26/46403907.jpg" alt=""></p>
+<p>为了理解这几个概念，我们还是用上面汽车的例子。只不过这次换成代码。我们先定义四个Class，车，车身，底盘，轮胎。然后初始化这辆车，最后跑这辆车。代码结构如下：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-11-26/48285435.jpg" alt=""></p>
+<p>这样，就相当于上面第一个例子，上层建筑依赖下层建筑——每一个类的构造函数都直接调用了底层代码的构造函数。假设我们需要改动一下轮胎（Tire）类，把它的尺寸变成动态的，而不是一直都是30。我们需要这样改：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-11-26/93716245.jpg" alt=""></p>
+<p>由于我们修改了轮胎的定义，为了让整个程序正常运行，我们需要做以下改动：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-11-26/93064527.jpg" alt=""></p>
+<p>由此我们可以看到，仅仅是为了修改轮胎的构造函数，这种设计却需要<strong>修改整个上层所有类的构造函数</strong>！在软件工程中，<strong>这样的设计几乎是不可维护的</strong>——在实际工程项目中，有的类可能会是几千个类的底层，如果每次修改这个类，我们都要修改所有以它作为依赖的类，那软件的维护成本就太高了。</p>
+<p>所以我们需要控制反转（IoC）,以上层控制下层。我们用依赖注入（Dependency Injection）这种方式来实现控制反转。<strong>所谓依赖注入，就是把底层类作为参数传入上层类，实现上层类对下层类的“控制”。</strong></p>
+<p>这里我们用构造方法传递的依赖注入方式重新书写车类的定义：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-11-26/66132704.jpg" alt=""></p>
+<p>这里我们再把轮胎尺寸变成动态的，同样为了让整个系统顺利运行，我们需要做如下修改：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-11-26/38696026.jpg" alt=""></p>
+<p>看到没？这里<strong>我只需要修改轮胎类就行了，不用修改其他任何上层类。</strong>这显然是更容易维护的代码。不仅如此，在实际的工程中，这种设计模式还有利于<strong>不同组的协同合作和单元测试：</strong>比如开发这四个类的分别是四个不同的组，那么只要定义好了接口，四个不同的组可以同时进行开发而不相互受限制；而对于单元测试，如果我们要写Car类的单元测试，就只需要Mock一下Framework类传入Car就行了，而不用把Framework, Bottom, Tire全部new一遍再来构造Car。</p>
+<h4 id="（三）控制反转容器"><a href="#（三）控制反转容器" class="headerlink" title="（三）控制反转容器"></a>（三）控制反转容器</h4><p>什么是<strong>控制反转容器(IoC Container)</strong>呢？其实上面的例子中，对车类进行初始化的那段代码发生的地方，就是控制反转容器。</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-11-26/41278159.jpg" alt=""></p>
+<p>显然你也应该观察到了，因为采用了依赖注入，在初始化的过程中就不可避免的会写大量的new。这里IoC容器就解决了这个问题。<strong>这个容器可以自动对你的代码进行初始化，你只需要维护一个Configuration（可以是xml可以是一段代码），而不用每次初始化一辆车都要亲手去写那一大段初始化的代码</strong>。这是引入IoC Container的第一个好处。</p>
+<p>IoC Container的第二个好处是：<strong>我们在创建实例的时候不需要了解其中的细节。</strong>在上面的例子中，我们自己手动创建一个车instance时候，是从底层往上层new的：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-11-26/17734783.jpg" alt=""></p>
+<p>这个过程中，我们需要了解整个Car/Framework/Bottom/Tire类构造函数是怎么定义的，才能一步一步new/注入。</p>
+<p>而IoC Container在进行这个工作的时候是反过来的，它先从最上层开始往下找依赖关系，到达最底层之后再往上一步一步new（有点像深度优先遍历）：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-11-26/40319836.jpg" alt=""></p>
+<p>这里IoC Container可以直接隐藏具体的创建实例的细节，在我们来看它就像一个工厂：</p>
+<p><img src="http://opmjieyki.bkt.clouddn.com/17-11-26/25904241.jpg" alt=""></p>
+<p>实际项目中，有的Service Class可能是十年前写的，有几百个类作为它的底层。假设我们新写的一个API需要实例化这个Service，我们总不可能回头去搞清楚这几百个类的构造函数吧？IoC Container的这个特性就很完美的解决了这类问题——<strong>因为这个架构要求你在写class的时候需要写相应的Config文件，所以你要初始化很久以前的Service类的时候，前人都已经写好了Config文件，你直接在需要用的地方注入这个Service就可以了</strong>。</p>
+<h4 id="（四）Spring-IOC"><a href="#（四）Spring-IOC" class="headerlink" title="（四）Spring IOC"></a>（四）Spring IOC</h4><p>对于Spring框架来说，就是由Spring来负责控制对象的生命周期和对象间的关系。在一个对象中，如果要使用另外的对象，就必须得到它（自己new一个，或者从JNDI中查询一个），使用完之后还要将对象销毁（比如Connection等）。那么IOC是如何做到的呢？</p>
+<p>所有的类都会在Spring容器中登记，告诉Spring你是什么，你需要什么，然后Spring会在系统运行到适当的时候，把你要的东西主动给你，同时也把你交给其他需要你的东西。</p>
+<p>所有类的创建、销毁都由Spring来控制，也就是说控制对象生命周期的不再是引用它的对象，而是Spring。<strong>对于某个对象而言，以前是它控制其他对象，现在是所有的对象都被Spring控制，这就叫控制反转。</strong></p>
+<h3 id="三、对象-关系映射模块"><a href="#三、对象-关系映射模块" class="headerlink" title="三、对象/关系映射模块"></a>三、对象/关系映射模块</h3><h3 id="四、Java的反射机制"><a href="#四、Java的反射机制" class="headerlink" title="四、Java的反射机制"></a>四、Java的反射机制</h3><h3 id="五、什么是ACID"><a href="#五、什么是ACID" class="headerlink" title="五、什么是ACID"></a>五、什么是ACID</h3><h3 id="六、Servlet-是如何处理请求的"><a href="#六、Servlet-是如何处理请求的" class="headerlink" title="六、Servlet 是如何处理请求的"></a>六、Servlet 是如何处理请求的</h3><p>通常当我们发送一个请求如<strong><a href="http://localhost:8080/TomcatTest/login" target="_blank" rel="external">http://localhost:8080/TomcatTest/login</a></strong>，容器是如何找到 LoginServlet 这个类来处理的呢？</p>
+<p>其实 tomcat 中有一个 mapper 类，专门用来保存 tomcat 中的 container 容器中的子容器信息，当 org.apache.catalina.connector.Request 类进去 Container 容器之前，Mapper 将会根据这次请求的 hostname,contextpath 把这些信息设置到 Request 的 mappingData 属性中去，最后再去匹配相应的 Servlet 处理器。</p>
+<p>到此为止 Servlet 已经可以帮我们完成所有工作了，但是现在的 web 应用很少直接将交互的全部页面交给 servlet 去实现，而是采用更加高效的 mvc 框架去实现，这些框架的基本原理就是把所有的请求都映射到一个 servlet 中，然后去实现 service 方法，比如后面要学习的 SpringMVC。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/操作系统/" rel="tag"># 操作系统</a>
+          
+            <a href="/tags/面试准备/" rel="tag"># 面试准备</a>
+          
+            <a href="/tags/数据结构/" rel="tag"># 数据结构</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/22/MySQL：视图的使用（三）/" rel="next" title="MySQL：视图的使用（三）">
+                <i class="fa fa-chevron-left"></i> MySQL：视图的使用（三）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/11/28/面试准备：计算机网络（二）/" rel="prev" title="面试准备：计算机网络（二）">
+                面试准备：计算机网络（二） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            <!--文章目录-->
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            <!--站点概览-->
+            站点概况
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          
+            <img class="site-author-image" itemprop="image"
+              src="/images/touxiang1.jpg"
+              alt="林寒弋" style="height: 130px; max-width: 130px" />
+          
+            <p class="site-author-name" itemprop="name">林寒弋</p>
+            <p class="site-description motion-element" itemprop="description">写完？写完是不可能的，这辈子都不可能写完的。编程我又不会，只有每天摸鱼，才维持了现在开心的样纸。</p>
+        </div>
+
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives">
+            
+                <span class="site-state-item-count">42</span>
+                <span class="site-state-item-name"><!--日志-->文章</span>
+              </a>
+            </div>
+          
+
+          
+              <div class="site-state-item site-state-categories">
+                  <a href="/categories">
+                      <span class="site-state-item-count">9</span>
+                      <span class="site-state-item-name"><!-- 分类 -->分类</span>
+                  </a>
+              </div>
+          
+          
+              <div class="site-state-item site-state-tags">
+                  <a href="/tags">
+                      <span class="site-state-item-count">37</span>
+                      <span class="site-state-item-name"><!-- 标签 -->标签</span>
+                  </a>
+              </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LINhunger" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>GitHub</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.vcoder.top" title="直播demo" target="_blank">直播demo</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、操作系统中堆栈的区别"><span class="nav-number">1.</span> <span class="nav-text">一、操作系统中堆栈的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#（一）操作系统中堆和栈的区别"><span class="nav-number">1.1.</span> <span class="nav-text">（一）操作系统中堆和栈的区别</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（二）Java中堆栈的区别"><span class="nav-number">1.2.</span> <span class="nav-text">（二）Java中堆栈的区别</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（三）java中变量在内存中的分配"><span class="nav-number">1.3.</span> <span class="nav-text">（三）java中变量在内存中的分配</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、Spring-IOC原理"><span class="nav-number">2.</span> <span class="nav-text">二、Spring IOC原理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#（一）依赖倒置"><span class="nav-number">2.1.</span> <span class="nav-text">（一）依赖倒置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（二）控制反转"><span class="nav-number">2.2.</span> <span class="nav-text">（二）控制反转</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（三）控制反转容器"><span class="nav-number">2.3.</span> <span class="nav-text">（三）控制反转容器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#（四）Spring-IOC"><span class="nav-number">2.4.</span> <span class="nav-text">（四）Spring IOC</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、对象-关系映射模块"><span class="nav-number">3.</span> <span class="nav-text">三、对象/关系映射模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四、Java的反射机制"><span class="nav-number">4.</span> <span class="nav-text">四、Java的反射机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#五、什么是ACID"><span class="nav-number">5.</span> <span class="nav-text">五、什么是ACID</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#六、Servlet-是如何处理请求的"><span class="nav-number">6.</span> <span class="nav-text">六、Servlet 是如何处理请求的</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">林寒弋</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.2</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.2"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
